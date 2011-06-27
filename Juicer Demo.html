@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Juicer Demo</title>
+	<script type="text/javascript" src="libs/mootools-core-1.3.2-full-compat.js"></script>
+	<script type="text/javascript" src="Juicer.js"></script>
+</head>
+<body>
+	<ul class="list">
+		{foreach .list}
+			<li>
+				<span class="name">[#.name]</span>
+				<span class="age">
+					{if .age lt 22} [#.age]
+					{else if .age eq 22} [#.age]+100
+					{else} [#.age]-18
+					{/if}
+				</span>
+				<span class="sex">
+					{switch .sex}
+						{case 'boy'} 'Man'
+						{case 'girl'} 'Woman'
+						{case 'unknow'} 'Simon'
+					{/switch}
+				</span>
+			</li>
+		{/foreach}
+	</ul>
+</body>
+</html>
