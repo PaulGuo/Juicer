@@ -8,9 +8,38 @@ window.addEvent('domready',function() {
 	}
 
 	var html=$$('ul.list')[0].innerHTML;
-	console.log(html);
-
-	//var html=_this.options.html||'<li><span>'+text.plName+'</span>'+'<span>'+text.content+'</span></li>';
+	
+	//Grammer
+	var whole=html;
+	var if_blocks=[];
+	
+	html=html.replace(/{if([\s\S]*?)}([\s\S]*?){\/if}/img,function($a,$1) {
+		var block=$a.replace(/[\r\n]*/img,'');
+		if_blocks.push(block);
+	});
+	
+	for(var i=0;i<if_blocks.length;i++) {
+		var cur=if_blocks[i];
+		var cur=cur.split(';');
+		for(var j=0;j<cur.length;j++) {
+			var segment=cur[j];
+			console.log(segment);
+			var condition=segment.replace(/{(.*?)if(.*?)}/img,'');
+			console.log(condition);
+		}
+		console.log(i);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	//console.log(html);
+	//console.log(if_blocks);
+	
 	//template engine lite
-	html=html.replace(/\[#(.*?)\]/img,function($a,$1) {return text[$1]});
+	//html=html.replace(/\[#(.*?)\]/img,function($a,$1) {return text[$1]});
 });

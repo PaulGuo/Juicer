@@ -12,9 +12,16 @@
 			<li>
 				<span class="name">[#.name]</span>
 				<span class="age">
-					{if .age lt 22} [#.age]
-					{else if .age eq 22} [#.age]+100
-					{else} [#.age]-18
+					{if .age lt 22} [#.age];
+					{else if .age eq 22} [#.age]+100;
+					{else if .age eq 23} [#.age]+150;
+					{else} [#.age]-18;
+					{/if}
+				</span>
+				<span class="age">
+					{if .age lt 22} [#.age];
+					{else if .age eq 22} [#.age]+100;
+					{else} [#.age]-18;
 					{/if}
 				</span>
 				<span class="sex">
