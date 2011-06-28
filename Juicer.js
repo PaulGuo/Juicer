@@ -21,13 +21,20 @@ window.addEvent('domready',function() {
 	for(var i=0;i<if_blocks.length;i++) {
 		var cur=if_blocks[i];
 		var cur=cur.split(';');
+		var conditions=[],results=[];
+		cur.pop();
 		for(var j=0;j<cur.length;j++) {
 			var segment=cur[j];
-			console.log(segment);
-			var condition=segment.replace(/{(.*?)if(.*?)}/img,'');
-			console.log(condition);
+			var condition=segment.replace(/{(.*?)if(.*?)}(.*)/img,'$2');
+			var result=segment.replace(/{(.*?)if(.*?)}(.*)/img,'$3');
+			if(condition==segment) {
+				condition=true;
+				result=segment.replace(/{else}(.*)/img,'$1');
+			}
+			conditions.push(condition);
+			results.push(condition);
 		}
-		console.log(i);
+		console.log(conditions);
 	}
 	
 	
