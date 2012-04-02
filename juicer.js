@@ -37,6 +37,15 @@
 		return s+b+e;
 	};
 
+	var reference=function(str,re) {
+		var ret;
+		str.replace(re,function() {
+			ret=arguments;
+			return ret[0];
+		});
+		return ret;
+	};
+
 	this.juicer=function(tpl,data) {
 		var fn=arguments.callee;
 		var re={
@@ -45,23 +54,13 @@
 			'unit':/\[#(.*?)(\s+condition=["|'](.*?)["|'])?\]/igm,
 		};
 		var _for=function(str) {
-			var chain,inner;
-			str.replace(re.for,function($a,$1,$2) {
-				chain=$1;
-				inner=$2;
-				return $a;
-			});
+			var ref=reference(str,re.for),chain=ref[1],inner=ref[2];
 			if(!data[chain]) return '';
 			for(var i=0,t=[];i<data[chain].length;i++) t.push(fn(inner,data[chain][i]));
 			return t.join('');
 		};
 		var _if=function(str) {
-			var condition,inner;
-			str.replace(re.if,function($a,$1,$2) {
-				condition=$1;
-				inner=$2;
-				return $a;
-			});
+			var ref=reference(str,re.if),condition=ref[1],inner=ref[2];
 			if(eval(fn(condition,data))) return fn(inner,data);
 			return '';
 		};
