@@ -28,7 +28,6 @@
 			p[str.indexOf(c[i])+c[i].length-1]='c';
 			str=_build(str,c,i);
 		}
-		console.log(p);
 		return _judge(p);
 	};
 
@@ -41,43 +40,46 @@
 	this.juicer=function(tpl,data) {
 		var fn=arguments.callee;
 		var re={
-			'for':/{@for\s+([^}]*?)}([\s\S]*?){@\/for}/igm,
-			'if':/{@if\s+([^}]*?)}([\s\S]*?){@\/if}/igm,
+			'for':/{@for\s+([^}]*)}([\s\S]*){@\/for}/igm,
+			'if':/{@if\s+([^}]*)}([\s\S]*){@\/if}/igm,
 			'unit':/\[#(.*?)(\s+condition=["|'](.*?)["|'])?\]/igm,
-			'_for':/{@for\s+([^}]*?)}([\s\S]*){@\/for}/igm,
-			'_if':/{@if\s+([^}]*?)}([\s\S]*){@\/if}/igm
 		};
-		var _for=function($a,$1,$2) {
-			if(!data[$1]) return '';
-			for(var i=0,t=[];i<data[$1].length;i++) t.push(fn($2,data[$1][i]));
+		var _for=function(str) {
+			var chain,inner;
+			str.replace(re.for,function($a,$1,$2) {
+				chain=$1;
+				inner=$2;
+				return $a;
+			});
+			if(!data[chain]) return '';
+			for(var i=0,t=[];i<data[chain].length;i++) t.push(fn(inner,data[chain][i]));
 			return t.join('');
 		};
-		var _if=function($a,$1,$2) {
-			if(eval(fn($1,data))) return fn($2,data);
+		var _if=function(str) {
+			var condition,inner;
+			str.replace(re.if,function($a,$1,$2) {
+				condition=$1;
+				inner=$2;
+				return $a;
+			});
+			if(eval(fn(condition,data))) return fn(inner,data);
 			return '';
 		};
 		var _unit=function($a,$1,$2,$3) {
-			if(!$3 || eval(fn($3,data))) return data[$1]?data[$1]:'';
+			if(!$3 || eval(fn($3,data))) return data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
 			return '';
 		};
 
-		//tpl=tpl.replace(recursive(tpl,/{@for[^}]*?}/igm,/{@\/for}/igm)?re._for:re.for,_for);
-		//tpl=tpl.replace(recursive(tpl,/{@if[^}]*?}/igm,/{@\/if}/igm)?re._if:re.if,_if);
-		//tpl=tpl.replace(re.unit,_unit);
+		for(var i=0,__f=recursive(tpl,/{@for[^}]*?}/igm,/{@\/for}/igm);i<__f.length;i++) {
+			tpl=replace(tpl,__f[i],_for(__f[i]));
+		}
 
-		var __f=recursive(tpl,/{@for[^}]*?}/igm,/{@\/for}/igm);
-		for(var i=0;i<__f.length;i++) {
-			tpl=replace(tpl,__f[i],__f[i].replace(re._for,_for));
+		for(var i=0,__i=recursive(tpl,/{@if[^}]*?}/igm,/{@\/if}/igm);i<__i.length;i++) {
+			tpl=replace(tpl,__i[i],_if(__i[i]));
 		}
-		var __i=recursive(tpl,/{@if[^}]*?}/igm,/{@\/if}/igm);
-		for(var i=0;i<__i.length;i++) {
-			tpl=replace(tpl,__i[i],__i[i].replace(re._if,_if));
-		}
+
 		tpl=tpl.replace(re.unit,_unit);
 
 		return tpl;
 	};
-
-	this.r=recursive;
-	this.p=replace;
 })();
