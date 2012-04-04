@@ -45,6 +45,10 @@
 		});
 		return ret;
 	};
+	
+	var evalString=new Function('exp',
+		"return exp;"
+	);
 
 	this.juicer=function(tpl,data) {
 		var fn=arguments.callee;
@@ -61,11 +65,11 @@
 		};
 		var _if=function(str) {
 			var ref=reference(str,re.if),condition=ref[1],inner=ref[2];
-			if(eval(fn(condition,data))) return fn(inner,data);
+			if(evalString(fn(condition,data))) return fn(inner,data);
 			return '';
 		};
 		var _unit=function($a,$1,$2,$3) {
-			if(!$3 || eval(fn($3,data))) return data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
+			if(!$3 || evalString(fn($3,data))) return data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
 			return '';
 		};
 
