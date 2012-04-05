@@ -53,18 +53,18 @@
 	this.juicer=function(tpl,data) {
 		var fn=arguments.callee;
 		var re={
-			'for':/{@for\s+([^}]*)}([\s\S]*){@\/for}/igm,
-			'if':/{@if\s+([^}]*)}([\s\S]*){@\/if}/igm,
-			'unit':/\[#(.*?)(\s+condition=["|'](.*?)["|'])?\]/igm,
+			'_for':/{@for\s+([^}]*)}([\s\S]*){@\/for}/igm,
+			'_if':/{@if\s+([^}]*)}([\s\S]*){@\/if}/igm,
+			'_unit':/\[#(.*?)(\s+condition=["|'](.*?)["|'])?\]/igm,
 		};
 		var _for=function(str) {
-			var ref=reference(str,re.for),chain=ref[1],inner=ref[2];
+			var ref=reference(str,re._for),chain=ref[1],inner=ref[2];
 			if(!data[chain]) return '';
 			for(var i=0,t=[];i<data[chain].length;i++) t.push(fn(inner,data[chain][i]));
 			return t.join('');
 		};
 		var _if=function(str) {
-			var ref=reference(str,re.if),condition=ref[1],inner=ref[2];
+			var ref=reference(str,re._if),condition=ref[1],inner=ref[2];
 			if(evalString(fn(condition,data))) return fn(inner,data);
 			return '';
 		};
@@ -81,7 +81,7 @@
 			tpl=replace(tpl,__i[i],_if(__i[i]));
 		}
 
-		tpl=tpl.replace(re.unit,_unit);
+		tpl=tpl.replace(re._unit,_unit);
 
 		return tpl;
 	};
