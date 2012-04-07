@@ -1,3 +1,14 @@
+/*
+	@author: guokai
+	@email/gtalk: badkaikai@gmail.com
+	@blog/website: http://benben.cc
+	@license: apache license,version 2.0
+	
+	@usage: http://paulguo.github.com/Juicer
+	@version: 0.1.0
+	@build: 110626120407
+*/
+
 (function() {
 	var recursive=function(str,o,c) {
 		var p=[],s=str,o=str.match(o)||[],c=str.match(c)||[];
