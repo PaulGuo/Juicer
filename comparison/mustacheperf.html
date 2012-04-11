@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script type="text/javascript" src="third-party/mustache.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var start=new Date().getTime();
+		var data={
+			list:[
+				{name:'guokai',show:true},
+				{name:'benben',show:false},
+				{name:'dier',show:true}
+			],
+			blah:[
+				{num:1},
+				{num:2},
+				{num:3,inner:[
+					{'time':'15:00'},
+					{'time':'16:00'},
+					{'time':'17:00'},
+					{'time':'18:00'}
+				]},
+				{num:4}
+			]
+		};
+		var tpl=[
+			'<ul>',
+				'{{#list}}',
+					'<li>{{name}} {{#show}}-{{/show}} {{#show}}{{name}}{{/show}}</li>',
+					'{{#show}}SHOW: TRUE{{/show}}',
+				'{{/list}}',
+				'{{#blah}}',
+					'<li>',
+						'num:{{num}} <br/>',
+						'{{#num}}',
+							'{{#inner}}{{time}}<br />{{/inner}}',
+						'{{/num}}',
+					'</li>',
+				'{{/blah}}',
+			'</ul>'
+		].join('');
+		for(var i=0;i<1000;i++) {
+			Mustache.to_html(tpl,data);
+		}
+		var end=new Date().getTime();
+		document.write('<style>body,p {font-family:cambria;}</style>');
+		document.write('<p><strong>Mustache Performance Test</strong></p>');
+		document.write('<p>run time: '+(end-start)+'ms</p>');
+		document.write(Mustache.to_html(tpl,data));
+	</script>
+</body>
+</html>
