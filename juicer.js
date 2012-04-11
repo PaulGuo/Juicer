@@ -61,8 +61,9 @@
 		"return exp;"
 	);
 
-	this.juicer=function(tpl,data) {
+	var juicer=function(tpl,data,option) {
 		var fn=arguments.callee;
+		var html=tpl,opt={cache:false};
 		var re={
 			'_for':/{@for\s+([^}]*)}([\s\S]*){@\/for}/igm,
 			'_if':/{@if\s+([^}]*)}([\s\S]*){@\/if}/igm,
@@ -71,29 +72,38 @@
 		var _for=function(str) {
 			var ref=reference(str,re._for),chain=ref[1],inner=ref[2];
 			if(!data[chain]) return '';
-			for(var i=0,t=[];i<data[chain].length;i++) t.push(fn(inner,data[chain][i]));
+			for(var i=0,t=[];i<data[chain].length;i++) t.push(fn(inner,data[chain][i],opt));
 			return t.join('');
 		};
 		var _if=function(str) {
 			var ref=reference(str,re._if),condition=ref[1],inner=ref[2];
-			if(evalString(fn(condition,data))) return fn(inner,data);
+			if(evalString(fn(condition,data,opt))) return fn(inner,data,opt);
 			return '';
 		};
 		var _unit=function($a,$1,$2,$3) {
-			if(!$3 || evalString(fn($3,data))) return data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
+			if(!$3 || evalString(fn($3,data,opt))) return data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
 			return '';
 		};
-
-		for(var i=0,__f=recursive(tpl,/{@for[^}]*?}/igm,/{@\/for}/igm);i<__f.length;i++) {
-			tpl=replace(tpl,__f[i],_for(__f[i]));
+		
+		if(_cache[tpl]) return _cache[tpl];
+		
+		for(var i=0,__f=recursive(html,/{@for[^}]*?}/igm,/{@\/for}/igm);i<__f.length;i++) {
+			html=replace(html,__f[i],_for(__f[i]));
 		}
 
-		for(var i=0,__i=recursive(tpl,/{@if[^}]*?}/igm,/{@\/if}/igm);i<__i.length;i++) {
-			tpl=replace(tpl,__i[i],_if(__i[i]));
+		for(var i=0,__i=recursive(html,/{@if[^}]*?}/igm,/{@\/if}/igm);i<__i.length;i++) {
+			html=replace(html,__i[i],_if(__i[i]));
 		}
 
-		tpl=tpl.replace(re._unit,_unit);
+		html=html.replace(re._unit,_unit);
 
-		return tpl;
+		if(!option || option.cache!==false) {
+			_cache[tpl]=html;
+		}
+		
+		return html;
 	};
+	
+	_cache={};
+	this.juicer=juicer;
 })();
