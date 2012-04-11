@@ -67,7 +67,7 @@
 		var re={
 			'_for':/{@for\s+([^}]*)}([\s\S]*){@\/for}/igm,
 			'_if':/{@if\s+([^}]*)}([\s\S]*){@\/if}/igm,
-			'_unit':/\[#(.*?)(\s+condition=["|'](.*?)["|'])?\]/igm,
+			'_unit':/\[#(.*?)(\s+condition=["|'](.*?)["|'])?\]/igm
 		};
 		var _for=function(str) {
 			var ref=reference(str,re._for),chain=ref[1],inner=ref[2];
@@ -81,7 +81,7 @@
 			return '';
 		};
 		var _unit=function($a,$1,$2,$3) {
-			if(!$3 || evalString(fn($3,data,opt))) return data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
+			if(!$3 || evalString(fn($3,data,opt))) return data && data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
 			return '';
 		};
 		
