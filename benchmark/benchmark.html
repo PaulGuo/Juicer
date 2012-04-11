@@ -5,6 +5,7 @@
 <script type="text/javascript" src="../comparison/third-party/ejohn.js"></script>
 <script type="text/javascript" src="../comparison/third-party/kissy.js"></script>
 <script type="text/javascript" src="../comparison/third-party/template.js"></script>
+<script type="text/javascript" src="https://github.com/QLeelulu/nTenjin/raw/master/nTenjin.js"></script>
 
 <script type="text/javascript">
 	var data={
@@ -96,6 +97,23 @@
 		'</ul>'
 	].join('');
 
+	tpl.ntenjin=[
+		'<ul>',
+			'<?js for(var i=0,l=it.list.length;i<l;i++) { ?>',
+				'<li>${ it.list[i].name } <?js if(it.list[i].show) { ?>- ${ it.list[i].name }<?js } ?></li>',
+				'<?js if(it.list[i].show) { ?>SHOW: TRUE<?js } ?>',
+			'<?js } ?>',
+			'<?js for(var i=0,l=it.blah.length;i<l;i++) { ?>',
+				'<li>',
+					'num:${ it.blah[i].num } <br/>',
+					'<?js if(it.blah[i].num==3) { ?>',
+						'<?js for(var j=0,l=it.blah[i].inner.length;j<l;j++) { ?>${ it.blah[i].inner[j].time }<br /><?js } ?>',
+					'<?js } ?>',
+				'</li>',
+			'<?js } ?>',
+		'</ul>'
+	].join('');
+
 	KISSY.use('template',function(S,T) {
 		w._juicer=function() {
 			juicer(tpl.juicer,data);
@@ -111,6 +129,12 @@
 
 		w._ejohn=function() {
 			tmpl(tpl.ejohn,data);
+		};
+
+		w._ntenjin=function() {
+			var ntenjin=new nTenjin.Template();
+			ntenjin.convert(tpl.ntenjin);
+			ntenjin.render(data);
 		};
 	});
 </script>

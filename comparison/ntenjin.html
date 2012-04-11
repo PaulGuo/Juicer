@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://github.com/QLeelulu/nTenjin/raw/master/nTenjin.js"></script>
+</head>
+
+<body>
+	<script>
+		var start=new Date().getTime();
+		var data={
+			list:[
+				{name:'guokai',show:true},
+				{name:'benben',show:false},
+				{name:'dier',show:true}
+			],
+			blah:[
+				{num:1},
+				{num:2},
+				{num:3,inner:[
+					{'time':'15:00'},
+					{'time':'16:00'},
+					{'time':'17:00'},
+					{'time':'18:00'}
+				]},
+				{num:4}
+			]
+		};
+		var tpl=[
+			'<ul>',
+				'<?js for(var i=0,l=it.list.length;i<l;i++) { ?>',
+					'<li>${ it.list[i].name } <?js if(it.list[i].show) { ?>- ${ it.list[i].name }<?js } ?></li>',
+					'<?js if(it.list[i].show) { ?>SHOW: TRUE<?js } ?>',
+				'<?js } ?>',
+				'<?js for(var i=0,l=it.blah.length;i<l;i++) { ?>',
+					'<li>',
+						'num:${ it.blah[i].num } <br/>',
+						'<?js if(it.blah[i].num==3) { ?>',
+							'<?js for(var j=0,l=it.blah[i].inner.length;j<l;j++) { ?>${ it.blah[i].inner[j].time }<br /><?js } ?>',
+						'<?js } ?>',
+					'</li>',
+				'<?js } ?>',
+			'</ul>'
+		].join('');
+		var ntenjin=new nTenjin.Template();
+		ntenjin.convert(tpl);
+		for(var i=0;i<1000;i++) {
+			ntenjin.render(data);
+		}
+		var end=new Date().getTime();
+		document.write('<style>body,p {font-family:cambria;}</style>');
+		document.write('<p><strong>nTenjin Performance Test</strong></p>');
+		document.write('<p>run time: '+(end-start)+'ms</p>');
+		document.write(ntenjin.render(data));
+	</script>
+</body>
+</html>
