@@ -98,6 +98,14 @@
 		'return exp;'
 	);
 
+	var __escape=function(html) {
+		return String(html)
+			.replace(/&(?!\w+;)/g,'&amp;')
+			.replace(/</g,'&lt;')
+			.replace(/>/g,'&gt;')
+			.replace(/"/g,'&quot;');
+	};
+
 	var __juicer=function(tpl,data,option) {
 		var fn=arguments.callee;
 		var html=tpl;
@@ -112,7 +120,8 @@
 			var ref=__reference(str,__re._for),chain=ref[1],inner=ref[2];
 			if(!data[chain]) return '';
 			for(var i=0,t=[];i<data[chain].length;i++) {
-				t.push(fn(inner,data[chain][i],opt));
+				var dat=data[chain][i];dat['.']=i;
+				t.push(fn(inner,dat,opt));
 			}
 			return t.join('');
 		};
@@ -127,7 +136,8 @@
 		
 		var _unit=function($a,$1,$2,$3) {
 			if(!$3 || __evalString(fn($3,data,opt))) {
-				return data && data[$1]?typeof(data[$1])=='object'?true:data[$1]:'';
+				if($1.match('#') && ($1=$1.substr(1))) return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:__escape(data[$1]):'';
+				return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:data[$1]:'';
 			}
 			return '';
 		};
