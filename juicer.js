@@ -85,17 +85,10 @@
 	this.__evalString=new Function('exp',
 		'return exp;'
 	);
-	
-	this.__compile=function(tpl,option) {
-		return new Function('tpl','data','option',__reference(__juicer.toString(),__re._function)[1]);
-	};
-	
-	this.__render=function(data) {
-		
-	};
 
-	var __juicer=function(tpl,data,option) {
-		var fn=arguments.callee;
+	this.__juicer=function(tpl,data,option) {
+		//var fn=arguments.callee;
+		var fn=__juicer;
 		var html=tpl;
 		var opt={cache:false};
 
@@ -136,6 +129,8 @@
 		return html;
 	};
 	
-	__juicer.compile=__compile;
-	this.juicer=__juicer;
+	this.juicer=function(tpl,data) {
+		var body=__reference(__juicer.toString(),__re._function)[1];
+		return new Function('tpl,data,option',body)(tpl,data);
+	};
 })();
