@@ -10,18 +10,19 @@
 */
 
 (function() {
-	var __cache={};
-	var __re={
+	this.__cache={};
+	this.__re={
 		'_for':/{@for\s+([^}]*)}([\s\S]*){@\/for}/igm,
 		'_if':/{@if\s+([^}]*)}([\s\S]*){@\/if}/igm,
 		'_unit':/\[#(.*?)(\s+condition=["|'](.*?)["|'])?\]/igm,
 		'_forstart':/{@for[^}]*?}/igm,
 		'_forend':/{@\/for}/igm,
 		'_ifstart':/{@if[^}]*?}/igm,
-		'_ifend':/{@\/if}/igm
+		'_ifend':/{@\/if}/igm,
+		'_function':/^function[^{]*?{([\s\S]*)}$/igm
 	};
 
-	var __recursive=function(str,o,c) {
+	this.__recursive=function(str,o,c) {
 		var p=[],s=str,o=str.match(o)||[],c=str.match(c)||[];
 		
 		var _build=function(str,o,i) {
@@ -59,20 +60,20 @@
 		return _judge(p);
 	};
 
-	var __replace=function(str,a,b) {
+	this.__replace=function(str,a,b) {
 		var s=str.substr(0,str.indexOf(a));
 		var e=str.substr(str.indexOf(a)+a.length);
 		return s+b+e;
 	};
 	
-	var __replaceAll=function(str,start,end,cb) {
+	this.__replaceAll=function(str,start,end,cb) {
 		for(var i=0,__f=__recursive(str,start,end);i<__f.length;i++) {
 			str=__replace(str,__f[i],cb(__f[i]));
 		}
 		return str;
 	};
 
-	var __reference=function(str,re) {
+	this.__reference=function(str,re) {
 		var ret;
 		str.replace(re,function() {
 			ret=arguments;
@@ -81,15 +82,15 @@
 		return ret;
 	};
 	
-	var __evalString=new Function('exp',
+	this.__evalString=new Function('exp',
 		'return exp;'
 	);
 	
-	var __compile=function(tpl,option) {
-		
+	this.__compile=function(tpl,option) {
+		return new Function('tpl','data','option',__reference(__juicer.toString(),__re._function)[1]);
 	};
 	
-	var __render=function(data) {
+	this.__render=function(data) {
 		
 	};
 
