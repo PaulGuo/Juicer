@@ -102,7 +102,11 @@
 		var fn=arguments.callee;
 		var html=tpl;
 		var opt={cache:false};
-		var ukey=tpl+__hash(JSON.stringify(data));
+
+		if(!option || option.cache!==false) {
+			var ukey=tpl+__hash(JSON.stringify(data));
+			if(__cache[ukey]) return __cache[ukey];
+		}
 
 		var _for=function(str) {
 			var ref=__reference(str,__re._for),chain=ref[1],inner=ref[2];
@@ -127,8 +131,6 @@
 			}
 			return '';
 		};
-		
-		if(__cache[ukey]) return __cache[ukey];
 		
 		html=__replaceAll(html,__re._forstart,__re._forend,_for);
 		html=__replaceAll(html,__re._ifstart,__re._ifend,_if);
