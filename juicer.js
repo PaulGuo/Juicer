@@ -115,17 +115,16 @@
 			return '';
 		};
 		
-		//if(__cache[tpl]) return __cache[tpl];
+		if(__cache[tpl]) return __cache[tpl];
 		
 		html=__replaceAll(html,__re._forstart,__re._forend,_for);
 		html=__replaceAll(html,__re._ifstart,__re._ifend,_if);
 		html=html.replace(__re._unit,_unit);
 
-		//if(!option || option.cache!==false) {
-		//	__cache[tpl]=html;
-		//}
+		if(!option || option.cache!==false) {
+			__cache[tpl]=html;
+		}
 		
-		fn=html=opt=_for=_if=_unit=null;
 		return html;
 	};
 	
