@@ -60,6 +60,7 @@
 			buf+="with(data) {"+
 					"p.push('" +
 						tpl
+							.replace(/\\/g,"\\\\")
 							.replace(/[\r\t\n]/g," ")
 							.split("<%").join("\t")
 							.replace(/((^|%>)[^\t]*)'/g,"$1\r")
