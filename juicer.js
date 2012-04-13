@@ -136,7 +136,7 @@
 		
 		var _unit=function($a,$1,$2,$3) {
 			if(!$3 || __evalString(fn($3,data,opt))) {
-				if($1.match('#') && ($1=$1.substr(1))) return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:__escape(data[$1]):'';
+				if($1.search('#')!==-1 && ($1=$1.substr(1))) return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:__escape(data[$1]):'';
 				return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:data[$1]:'';
 			}
 			return '';
