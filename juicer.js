@@ -71,13 +71,7 @@
 				"};"+
 				"return p.join('');";
 				
-			this.render=function(data) {
-				try {
-					return new Function('data',buf)(data);
-				} catch(e) {
-					return '<strong>Juicer Error: </strong>'+e.message;
-				}
-			};
+			this.render=new Function('data',buf);
 			return this;
 		};
 	};
