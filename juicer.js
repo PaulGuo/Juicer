@@ -37,6 +37,8 @@
 	var __recursive=function(str,o,c) {
 		var p=[],s=str,o=str.match(o)||[],c=str.match(c)||[];
 		
+		if(!str || !o.length || !c.length) return [];
+		
 		var _build=function(str,o,i) {
 			var s=str.substr(0,str.indexOf(o[i]));
 			var e=str.substr(str.indexOf(o[i])+o[i].length);
@@ -58,7 +60,7 @@
 			}
 			return t;
 		};
-		
+		if(!str || !o.length || !c.length) return [];
 		for(var i=0;i<o.length;i++) {
 			p[str.indexOf(o[i])]='o';
 			str=_build(str,o,i);
@@ -79,6 +81,7 @@
 	};
 	
 	var __replaceAll=function(str,start,end,cb) {
+		if(!str) return str;
 		for(var i=0,__f=__recursive(str,start,end);i<__f.length;i++) {
 			str=__replace(str,__f[i],cb(__f[i]));
 		}
@@ -86,7 +89,8 @@
 	};
 
 	var __reference=function(str,re) {
-		var ret;
+		var ret=[];
+		if(!str) return ret;
 		str.replace(re,function() {
 			ret=arguments;
 			return ret[0];
@@ -136,7 +140,7 @@
 		
 		var _unit=function($a,$1,$2,$3) {
 			if(!$3 || __evalString(fn($3,data,opt))) {
-				if($1.match('#') && ($1=$1.substr(1))) return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:__escape(data[$1]):'';
+				if($1.search('#')!==-1 && ($1=$1.substr(1))) return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:__escape(data[$1]):'';
 				return data && data[$1]!==undefined?typeof(data[$1])=='object'?true:data[$1]:'';
 			}
 			return '';
