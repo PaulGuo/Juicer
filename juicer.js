@@ -3,7 +3,7 @@
 	@email/gtalk: badkaikai@gmail.com
 	@blog/website: http://benben.cc
 	@license: apache license,version 2.0
-	@version: 0.2.0
+	@version: 0.2.1
 */
 
 (function() {
@@ -50,10 +50,10 @@
 				})
 				.replace(juicer.settings.ifend,'<% } %>')
 				.replace(juicer.settings.noneencode,function($,varname) {
-					return '<%= '+varname+' %>';
+					return '<%= '+(varname!=='.'?varname:'i')+' %>';
 				})
 				.replace(juicer.settings.interpolate,function($,varname) {
-					return '<%= __escapehtml.__escape('+varname+') %>';
+					return '<%= __escapehtml.__escape('+(varname!=='.'?varname:'i')+') %>';
 				});
 			
 			buf+="var p=[];";
