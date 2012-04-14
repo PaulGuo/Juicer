@@ -38,7 +38,7 @@
 	};
 	
 	juicer.template=function() {
-		this.parse=function(tpl) {
+		this.parse=function(tpl,options) {
 			var buf=[].join('');
 			
 			tpl=tpl.replace(juicer.settings.forstart,function($,varname,alias) {
@@ -72,13 +72,24 @@
 				"};"+
 				"return p.join('');";
 				
-			this.render=new Function('data',buf);
+			if(!options || options.cache!==false) {
+				this.render=new Function('data',buf);
+			} else {
+				this.render=function(data) {
+					var __a=[],__v=[];
+					for(item in data) {
+						__a.push(item);
+						__v.push(data[item]);
+					}
+					return new Function(__a,buf.replace('with(data) {','').replace('};return','return')).apply(null,__v);
+				};
+			}
 			return this;
 		};
 	};
 	
 	juicer.compile=function(tpl,options) {
-		var engine=__cache[tpl]?__cache[tpl]:new this.template().parse(tpl);
+		var engine=__cache[tpl]?__cache[tpl]:new this.template().parse(tpl,options);
 		if(!options || options.cache!==false) __cache[tpl]=engine;
 		return engine;
 	};
