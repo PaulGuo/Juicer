@@ -56,6 +56,7 @@
 					return '<%= __escapehtml.__escape('+(varname!=='.'?varname:'i')+') %>';
 				});
 			
+			buf+="var data=data||{};";
 			buf+="var p=[];";
 			buf+="with(data) {"+
 					"p.push('" +
