@@ -1,0 +1,48 @@
+var http=require('http');
+var juicer=require('./juicer');
+
+var data={
+	list:[
+		{name:'guokai<br/>',show:true},
+		{name:'benben',show:false},
+		{name:'dier',show:true}
+	],
+	blah:[
+		{num:1},
+		{num:2},
+		{num:3,inner:[
+			{'time':'15:00'},
+			{'time':'16:00'},
+			{'time':'17:00'},
+			{'time':'18:00'}
+		]},
+		{num:4}
+	]
+};
+
+var tpl=[
+	'<ul>',
+		'{@for list as it}',
+			'<li>${.} - $${it.name} {@if it.show} ${it.name} {@/if}</li>',
+		'{@/for}',
+		'{@for blah as it}',
+			'<li>',
+				'${.} - num:${it.num}<br/>',
+				'{@if it.num==3}',
+					'{@for it.inner as it2}',
+						'${it2.time}<br />',
+					'{@/for}',
+				'{@/if}',
+			'</li>',
+		'{@/for}',
+	'</ul>'
+].join('');
+
+http.createServer(function(req,res) {
+	res.writeHead(200,{'Content-Type':'text/html'});
+	res.write('<h2>Hello Juicer</h2>\n');
+	res.write(juicer.to_html(tpl,data));
+	res.end();
+}).listen(1012);
+
+console.log('Server running at http://127.0.0.1:1012/');
