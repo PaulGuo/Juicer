@@ -5,17 +5,23 @@
 	<title>Juicer - a javascript template engine which u need</title>
 	<link rel="stylesheet" href="stylesheets/reset.css" />
 	<link rel="stylesheet" href="stylesheets/main.css" />
+	<script type="text/javascript" src="javascripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="javascripts/juicer.js"></script>
+	<script type="text/javascript" src="javascripts/main.js"></script>
 </head>
 <body>
 	<div id="intro">
-		<a href="#!" id="logo"><img src="images/juicer-logo.png" alt="juicer.js"></a>
+		<a href="#!" id="logo">
+			<img src="images/juicer-fruit.png" alt="juicer.js" class="fruit" />
+			<img src="images/juicer-logo.png" alt="juicer.js">
+		</a>
 
 		<p>juicer is a lightweight javascript template engine, it’s fast and easy to use.
 		it’s syntax like smarty, it can running either at browser or node.js</p>
 
-		<a href="#download" class="button" id="downloadbutton">Download</a>
-		<a href="api/" class="button" id="docsbutton">Docs</a>
-		<a href="api/" class="button" id="demobutton">Demo</a>
+		<a href="https://github.com/PaulGuo/Juicer/zipball/master#download" class="button" id="downloadbutton">Download</a>
+		<a href="#!" class="button" id="docsbutton">Docs</a>
+		<a href="#!" class="button" id="demobutton">Demo</a>
 		<p class="version">v0.2.1</p> 
 	</div>
 
@@ -24,41 +30,66 @@
 			<div class="help">
 				<h3>$ { help }:</h3>
 				<ul>
-					<li><a href="">syntax of juicer</a></li>
-					<li><a href="">some really demos</a></li>
+					<li><a href="">syntax</a></li>
+					<li><a href="">demos</a></li>
 					<li><a href="">using via node.js</a></li>
-					<li><a href="">about author</a></li>
+					<li><a href="">about</a></li>
 					<li><a href="">faq @google group</a></li>
 				</ul>
 			</div>
 
-			<textarea class="small-demo">
-<ul>
+			<div class="codes">
+				<h3>EXAMPLES:</h3>
+
+				<span>`Template String:</span>
+				<pre class="J_tpl">
+&lt;ul&gt;
 	{@for list as it}
-		<li>${it.name} (index: ${.})</li>
+		&lt;li&gt;${it.name} (index: ${.})&lt;/li&gt;
 	{@/for}
 	{@for blah as it}
-		<li>
-			num: ${it.num} <br />
+		&lt;li&gt;
+			num: ${it.num} &lt;br /&gt;
 			{@if it.num==3}
 				{@for it.inner as it2}
-					${it2.time} <br />
+					${it2.time} &lt;br /&gt;
 				{@/for}
 			{@/if}
-		</li>
+		&lt;/li&gt;
 	{@/for}
-</ul></textarea>
+&lt;/ul&gt;</pre>
+
+				<span>`Data Source:</span>
+				<pre class="J_data">
+var data={
+	list:[
+		{name:'guokai',show:true},
+		{name:'benben',show:false},
+		{name:'dierbaby',show:true},
+	],
+	blah:[
+		{num:1},
+		{num:2},
+		{num:3,inner:[
+			{'time':'15:00'},
+			{'time':'16:00'},
+			{'time':'17:00'},
+			{'time':'18:00'}
+		]},
+		{num:4}
+	]
+};</pre>
+
+				<div class="render"><a href="javascript:;" class="J_render">CLICK TO RENDER THE TEMPLATE (TEST)</a></div>
+
+				<span>`Render Result:</span>
+				<div class="result J_result">...</div>
+			</div>
 		</div>
 	</div>
 
 	<div id="footer">
-		<ul>
-			<li><a href=""><span class="b">b</span>enben.cc</a> |</li>
-			<li><a href="">about</a> |</li>
-			<li><a href="">download</a> |</li>
-			<li><a href="">docs</a> |</li>
-			<li><a href="">commnity</a></li>
-		</ul>
+		<a href="http://benben.cc/"><img src="images/copyright.png" alt="" /></a>
 	</div>
 </body>
 </html>
