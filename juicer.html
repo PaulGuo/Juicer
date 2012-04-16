@@ -11,7 +11,7 @@
 			list:[
 				{name:'guokai',show:true},
 				{name:'benben',show:false},
-				{name:'dier',show:true},
+				{name:'dier',show:true}
 			],
 			blah:[
 				{num:1},
@@ -27,31 +27,29 @@
 		};
 		var tpl=[
 			'<ul>',
-				'{@for list}',
-					'<li>[#name] {@if [#show]}-{@/if} [#name condition="[#show]"]</li>',
-					'{@if [#show]}SHOW: TRUE{@/if}',
+				'{@for data.list as it}',
+					'<li>${it.name} (index: ${.})</li>',
 				'{@/for}',
-				'{@if [#blah]}<br />----------<br />{@/if}',
-				'{@if [#blah]}',
-					'xxxxxxxxxx',
-					'{@if true}',
-						'yyyyyy',
-					'{@/if}',
-					'{@if false}',
-						'zzzzzz',
-					'{@/if}',
-				'{@/if}',
-				'{@for blah}',
+				'{@for data.blah as it}',
 					'<li>',
-						'num:[#num] <br/>',
-						'{@if [#num]==3}',
-							'{@for inner}[#time]<br />{@/for}',
+						'num: ${it.num} <br />',
+						'{@if it.num==3}',
+							'{@for it.inner as it2}',
+								'${it2.time} <br />',
+							'{@/for}',
 						'{@/if}',
 					'</li>',
 				'{@/for}',
 			'</ul>'
 		].join('');
-		document.write(juicer(tpl,data));
+		var starttimestamp=new Date().getTime();
+		for(var i=0;i<1000;i++) {
+			juicer.to_html(tpl,data,{cache:false});
+		}
+		var endtimestamp=new Date().getTime();
+		var exhausttime=endtimestamp-starttimestamp;
+		document.write(juicer.to_html(tpl,data));
+		document.write('run time: '+exhausttime);
 	</script>
 </body>
 </html>

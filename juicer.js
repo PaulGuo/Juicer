@@ -57,21 +57,17 @@
 				});
 			
 			buf+="var data=data||{};";
-			buf+="var p=[];";
-			buf+="with(data) {"+
-					"p.push('" +
-						tpl
-							.replace(/\\/g,"\\\\")
-							.replace(/[\r\t\n]/g," ")
-							.split("<%").join("\t")
-							.replace(/((^|%>)[^\t]*)'/g,"$1\r")
-							.replace(/\t=(.*?)%>/g,"',$1,'")
-							.split("\t").join("');")
-							.split("%>").join("p.push('")
-							.split("\r").join("\\'")+
-					"');"+
-				"};"+
-				"return p.join('');";
+			buf+="var out='';out+='";
+			buf+=tpl
+					.replace(/\\/g,"\\\\")
+					.replace(/[\r\t\n]/g," ")
+					.replace(/'(?=[^%]*%>)/g,"\t")
+					.split("'").join("\\'")
+					.split("\t").join("'")
+					.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
+					.split("<%").join("';")
+					.split("%>").join("out+='")+
+					"';return out;";
 				
 			this.render=new Function('data',buf);
 			return this;
