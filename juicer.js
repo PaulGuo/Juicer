@@ -38,7 +38,7 @@
 	};
 	
 	juicer.template=function() {
-		this.parse=function(tpl) {
+		this.parse=function(tpl,options) {
 			var buf=[].join('');
 			
 			tpl=tpl.replace(juicer.settings.forstart,function($,varname,alias) {
@@ -57,7 +57,7 @@
 				});
 			
 			buf+="var data=data||{};";
-			if(options.loose===true) {
+			if(options && options.loose===true) {
 				buf+="var p=[];";
 				buf+="with(data) {"+
 						"p.push('" +
