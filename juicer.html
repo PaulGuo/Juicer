@@ -27,21 +27,24 @@
 		};
 		var tpl=[
 			'<ul>',
-				'{@for data.list as it}',
+				'{@each data.list as it}',
 					'<li>${it.name} (index: ${.})</li>',
-				'{@/for}',
-				'{@for data.blah as it}',
+				'{@/each}',
+				'{@each data.blah as it}',
 					'<li>',
 						'num: ${it.num} <br />',
 						'{@if it.num==3}',
-							'{@for it.inner as it2}',
+							'{@each it.inner as it2}',
 								'${it2.time} <br />',
-							'{@/for}',
+							'{@/each}',
 						'{@/if}',
 					'</li>',
-				'{@/for}',
+				'{@/each}',
 			'</ul>'
 		].join('');
+		var inc=function(n) {
+			return n+1;
+		};
 		var starttimestamp=new Date().getTime();
 		for(var i=0;i<1000;i++) {
 			juicer.to_html(tpl,data,{cache:false});
