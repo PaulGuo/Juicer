@@ -63,9 +63,9 @@
 				//for expression
 				.replace(juicer.settings.forstart,function($,varname,alias,key) {
 					var alias=alias||'value',key=key && key.substr(1);
-					return '<% for(var i=0,l='+varname+'.length;i<l;i++) {var '+
-								alias+'='+varname+'[i];'+
-								(key?(key+'='+'i;'):'')+
+					return '<% for(var i=0,l='+varname+'.length;i<l;i++) {'+
+								'var '+alias+'='+varname+'[i];'+
+								(key?('var '+key+'='+'i;'):'')+
 							' %>';
 				})
 				.replace(juicer.settings.forend,'<% } %>')
