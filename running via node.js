@@ -22,10 +22,10 @@ var data={
 
 var tpl=[
 	'<ul>',
-		'{@for list as it}',
+		'{@for data.list as it}',
 			'<li>${.} - $${it.name} {@if it.show} ${it.name} {@/if}</li>',
 		'{@/for}',
-		'{@for blah as it}',
+		'{@for data.blah as it}',
 			'<li>',
 				'${.} - num:${it.num}<br/>',
 				'{@if it.num==3}',
