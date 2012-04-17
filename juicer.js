@@ -38,6 +38,25 @@
 	};
 
 	juicer.template=function() {
+		var __this=this;
+	
+		this.__interpolate=function(varname,escape) {
+			var __define=varname.split('|'),fn='';
+			if(__define.length>1) {
+				varname=__define.shift();
+				func=__define.shift();
+			}
+			return '<%= '+
+						(escape?'__escapehtml.__escape':'')+
+							'('+
+								fn+
+									'('+
+										(varname!=='.'?varname:'i')+
+									')'+
+							')'+
+					' %>';
+		};
+	
 		this.__shell=function(tpl) {
 			tpl=tpl
 				//for expression
@@ -52,11 +71,11 @@
 				.replace(juicer.settings.ifend,'<% } %>')
 				//interpolate without escape
 				.replace(juicer.settings.noneencode,function($,varname) {
-					return '<%= '+(varname!=='.'?varname:'i')+' %>';
+					return __this.__interpolate(varname,false);
 				})
 				//interpolate with escape
 				.replace(juicer.settings.interpolate,function($,varname) {
-					return '<%= __escapehtml.__escape('+(varname!=='.'?varname:'i')+') %>';
+					return __this.__interpolate(varname,true);
 				});
 
 			return tpl;
