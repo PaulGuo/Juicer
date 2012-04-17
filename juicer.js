@@ -29,10 +29,11 @@
 	};
 
 	juicer.settings = {
-		forstart:/{@for\s*([\w\.]*?)\s*as\s*(\w*?)}/igm,
-		forend:/{@\/for}/igm,
+		forstart:/{@each\s*([\w\.]*?)\s*as\s*(\w*?)(,\w*?)?}/igm,
+		forend:/{@\/each}/igm,
 		ifstart:/{@if\s*([^}]*?)}/igm,
 		ifend:/{@\/if}/igm,
+		elsestart:/{@else}/igm,
 		interpolate:/\${([\s\S]+?)}/igm,
 		noneencode:/\$\${([\s\S]+?)}/igm
 	};
@@ -60,8 +61,12 @@
 		this.__shell=function(tpl) {
 			tpl=tpl
 				//for expression
-				.replace(juicer.settings.forstart,function($,varname,alias) {
-					return '<% for(var i=0,l='+varname+'.length;i<l;i++) {var '+alias+'='+varname+'[i]; %>';
+				.replace(juicer.settings.forstart,function($,varname,alias,key) {
+					var alias=alias||'value',key=key.substr(1);
+					return '<% for(var i=0,l='+varname+'.length;i<l;i++) {var '+
+								alias+'='+varname+'[i];'+
+								(key?(key+'='+'i;'):'')+
+							' %>';
 				})
 				.replace(juicer.settings.forend,'<% } %>')
 				//if expression
@@ -69,6 +74,10 @@
 					return '<% if('+condition+') { %>';
 				})
 				.replace(juicer.settings.ifend,'<% } %>')
+				//else expression
+				.replace(juicer.settings.elsestart,function($) {
+					return '<% } else { %>';
+				})
 				//interpolate without escape
 				.replace(juicer.settings.noneencode,function($,varname) {
 					return __this.__interpolate(varname,false);
