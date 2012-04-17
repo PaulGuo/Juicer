@@ -1,0 +1,30 @@
+body {
+	width:800px;
+	margin:0 auto;
+	font-family:Georgia,'Nimbus Roman No9 L','Liberation Serif',serif;
+	line-height:1.4em;
+	background:#fff;
+}
+
+pre {
+	border-left:4px solid gray;
+	padding-left:10px;
+	background:#eee;
+}
+
+pre code {
+	font-size:0.8125em;
+	line-height:1.4em;
+	padding:0px;
+	margin-top:3px;
+	margin-bottom:1px;
+	font-family:Consolas,Inconsolata,'Bitstream Vera Sans Mono',Menlo, Monaco,'Andale Mono','Courier New',monospace;
+}
+
+h2 {
+	margin:30px 0;
+}
+
+h2,h4 {
+	letter-spacing:1px;
+}

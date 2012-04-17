@@ -4,7 +4,7 @@ $(document).ready(function() {
 		list:[
 			{name:'guokai',show:true},
 			{name:'benben',show:false},
-			{name:'dierbaby',show:true},
+			{name:'dierbaby',show:true}
 		],
 		blah:[
 			{num:1},

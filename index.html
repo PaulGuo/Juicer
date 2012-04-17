@@ -20,8 +20,8 @@
 		it’s syntax like smarty, it can running either at browser or node.js</p>
 
 		<a href="https://github.com/PaulGuo/Juicer/zipball/master#download" class="button" id="downloadbutton">Download</a>
-		<a href="#!" class="button" id="docsbutton">Docs</a>
-		<a href="#!" class="button" id="demobutton">Demo</a>
+		<a href="docs/docs.html" class="button" id="docsbutton">Docs</a>
+		<a href="docs/docs.html#!demo" class="button" id="demobutton">Demo</a>
 		<p class="version">v0.2.1</p> 
 	</div>
 
@@ -44,19 +44,19 @@
 				<span>`Template String:</span>
 				<pre class="J_tpl">
 &lt;ul&gt;
-	{@for list as it}
+	{@each data.list as it}
 		&lt;li&gt;${it.name} (index: ${.})&lt;/li&gt;
-	{@/for}
-	{@for blah as it}
+	{@/each}
+	{@each data.blah as it}
 		&lt;li&gt;
 			num: ${it.num} &lt;br /&gt;
 			{@if it.num==3}
-				{@for it.inner as it2}
+				{@each it.inner as it2}
 					${it2.time} &lt;br /&gt;
-				{@/for}
+				{@/each}
 			{@/if}
 		&lt;/li&gt;
-	{@/for}
+	{@/each}
 &lt;/ul&gt;</pre>
 
 				<span>`Data Source:</span>
@@ -65,7 +65,7 @@ var data={
 	list:[
 		{name:'guokai',show:true},
 		{name:'benben',show:false},
-		{name:'dierbaby',show:true},
+		{name:'dierbaby',show:true}
 	],
 	blah:[
 		{num:1},

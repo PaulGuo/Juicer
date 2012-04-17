@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Juicer Docs</title>
+	<link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+<h2>Juicer Docs</h2>
+
+<p>juicer is a fast lightweight javascript template engine, you can use it to split the data and the html structure. it can 
+also running via node.js as demo below.</p>
+
+<h4>the name of juicer</h4>
+
+<p>data(json) like fruits, template like water, combine them with juicer.</p>
+
+<h4>import juicer.js</h4>
+
+<pre><code>&lt;script type="text/javascript" src="juicer.min.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<h2>* License</h2>
+
+<p>JavaScript Garden is published under the <a href="https://github.com/PaulGuo/Juicer/LICENCE">MIT license</a> and hosted on
+<a href="https://github.com/PaulGuo/Juicer">GitHub</a>. If you find errors or typos please <a href="https://github.com/PaulGuo/Juicer/issues">file an issue</a> or a pull 
+request on the repository.</p>
+
+<h2>* api</h2>
+
+<p>compile and render the template with given data.</p>
+
+<pre><code>juicer.to_html(tpl,data,options);
+</code></pre>
+
+<p>only compile the template.</p>
+
+<pre><code>var tpl=juicer.compile(tpl,options);
+</code></pre>
+
+<p>render the template using complied template.</p>
+
+<pre><code>var tpl=juicer.compile(tpl,options);
+var html=tpl.render(data);
+</code></pre>
+
+<h4>options</h4>
+
+<pre><code>{
+	cache:true/false,
+	loose:false/true
+}
+</code></pre>
+
+<p>cache means that whether to cache the compiled template.</p>
+
+<h2>* syntax</h2>
+
+<h4>a. ${var}</h4>
+
+<p>using ${} to evaluating expressions and functions.</p>
+
+<pre><code>${data.name}
+${data.name|function}
+</code></pre>
+
+<h4>b. {@each} ... {@/each}</h4>
+
+<p>when you need iterate a list, you can use `each` like this.</p>
+
+<pre><code>{@each data.list as item}
+	${item.prop}
+	${.} //index
+{@/each}
+</code></pre>
+
+<p>you can also custom the index name.</p>
+
+<pre><code>{@each data.list as item,index}
+	${item.prop}
+	${index} //index
+{@/each}
+</code></pre>
+
+<h4>c. {@if} ... {@else} ... {@/if}</h4>
+
+<p>you can also use if-else if you need.</p>
+
+<pre><code>{@each data.list as item,index}
+	{@if index===3}
+		the index is 3, the value is ${item.prop}
+	{@else}
+		the index is not 3, the value is ${item.prop}
+	{@/if}
+{@/each}
+</code></pre>
+
+<h2>* running via node.js</h2>
+
+<pre><code>var juicer=require('./juicer');
+var html=juicer.to_html(tpl,data,options);
+</code></pre>
+
+<h2>* demo</h2>
+
+<pre><code>&lt;ul&gt;
+	{@each data.list as it,index}
+		&lt;li&gt;${it.name} (index: ${index})&lt;/li&gt;
+	{@/each}
+	{@each data.blah as it}
+		&lt;li&gt;
+			num: ${it.num} &lt;br /&gt;
+			{@if it.num==3}
+				{@each it.inner as it2}
+					${it2.time} &lt;br /&gt;
+				{@/each}
+			{@/if}
+		&lt;/li&gt;
+	{@/each}
+&lt;/ul&gt;
+
+var data={
+	list:[
+		{name:'guokai',show:true},
+		{name:'benben',show:false},
+		{name:'dierbaby',show:true},
+	],
+	blah:[
+		{num:1},
+		{num:2},
+		{num:3,inner:[
+			{'time':'15:00'},
+			{'time':'16:00'},
+			{'time':'17:00'},
+			{'time':'18:00'}
+		]},
+		{num:4}
+	]
+};
+</code></pre>
+
+</body>
+</html>
