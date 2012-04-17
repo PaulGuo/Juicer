@@ -143,6 +143,7 @@ a {
 	margin-left:-1px;
 	padding:0 0 0 50px;
 	font-family:'Droid Sans Mono','Bitstream Vera Sans Mono','DejaVu Sans Mono',Monaco,Courier,monospace,courier new;
+	font-family:Consolas,Inconsolata,'Bitstream Vera Sans Mono',Menlo, Monaco,'Andale Mono','Courier New',monospace;
 	color:#d2d8ba;
 	font-size:11px;
 	text-align:left;
@@ -160,6 +161,7 @@ a {
 	margin:5px 0;
 	padding-left:10px;
 	border-left:1px dotted #43453b;
+	font-family:Consolas,Inconsolata,'Bitstream Vera Sans Mono',Menlo, Monaco,'Andale Mono','Courier New',monospace;
 }
 
 #quotes .codes .render {

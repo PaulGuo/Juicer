@@ -22,6 +22,7 @@ $(document).ready(function() {
 	$('.J_render').click(function() {
 		var result=juicer && juicer.to_html(tpl,data);
 		result=result.replace(/</g,'&lt;').replace(/>/g,'&gt;');
-		$('.J_result').html(result).fadeOut().fadeIn();
+		//$('.J_result').html(result).fadeOut().fadeIn();
+		$('.J_result').html(result);
 	});
 });
