@@ -3,12 +3,12 @@
 	@email/gtalk: badkaikai@gmail.com
 	@blog/website: http://benben.cc
 	@license: apache license,version 2.0
-	@version: 0.2.1
+	@version: 0.2.2
 */
 
 (function() {
 	var juicer={
-		version:'0.2.1'
+		version:'0.2.2'
 	};
 
 	this.__cache={};
@@ -38,56 +38,83 @@
 	};
 
 	juicer.template=function() {
-		this.parse=function(tpl,options) {
-			var buf=[].join('');
-
-			tpl=tpl.replace(juicer.settings.forstart,function($,varname,alias) {
+		this.__shell=function(tpl) {
+			tpl=tpl
+				//for expression
+				.replace(juicer.settings.forstart,function($,varname,alias) {
 					return '<% for(var i=0,l='+varname+'.length;i<l;i++) {var '+alias+'='+varname+'[i]; %>';
 				})
 				.replace(juicer.settings.forend,'<% } %>')
+				//if expression
 				.replace(juicer.settings.ifstart,function($,condition) {
 					return '<% if('+condition+') { %>';
 				})
 				.replace(juicer.settings.ifend,'<% } %>')
+				//interpolate without escape
 				.replace(juicer.settings.noneencode,function($,varname) {
 					return '<%= '+(varname!=='.'?varname:'i')+' %>';
 				})
+				//interpolate with escape
 				.replace(juicer.settings.interpolate,function($,varname) {
 					return '<%= __escapehtml.__escape('+(varname!=='.'?varname:'i')+') %>';
 				});
 
-			buf+="var data=data||{};";
+			return tpl;
+		};
+
+		this.__pure=function(tpl,options) {
 			if(options && options.loose===true) {
-				buf+="var p=[];";
-				buf+="with(data) {"+
-						"p.push('" +
-							tpl
-								.replace(/\\/g,"\\\\")
-								.replace(/[\r\t\n]/g," ")
-								.split("<%").join("\t")
-								.replace(/((^|%>)[^\t]*)'/g,"$1\r")
-								.replace(/\t=(.*?)%>/g,"',$1,'")
-								.split("\t").join("');")
-								.split("%>").join("p.push('")
-								.split("\r").join("\\'")+
-						"');"+
-					"};"+
-					"return p.join('');";
+				buf=this.__looseconvert(tpl);
 			} else {
-				buf+="var out='';out+='";
-				buf+=tpl
-						.replace(/\\/g,"\\\\")
-						.replace(/[\r\t\n]/g," ")
-						.replace(/'(?=[^%]*%>)/g,"\t")
-						.split("'").join("\\'")
-						.split("\t").join("'")
-						.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
-						.split("<%").join("';")
-						.split("%>").join("out+='")+
-						"';return out;";
+				buf=this.__convert(tpl);
 			}
 
-			this.render=new Function('data',buf);
+			return buf;
+		};
+
+		this.__convert=function(tpl) {
+			var buf=[].join('');
+			buf+="var data=data||{};";
+			buf+="var out='';out+='";
+			buf+=tpl
+					.replace(/\\/g,"\\\\")
+					.replace(/[\r\t\n]/g," ")
+					.replace(/'(?=[^%]*%>)/g,"\t")
+					.split("'").join("\\'")
+					.split("\t").join("'")
+					.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
+					.split("<%").join("';")
+					.split("%>").join("out+='")+
+					"';return out;";
+			return buf;
+		};
+
+		this.__looseconvert=function(tpl) {
+			var buf=[].join('');
+			buf+="var data=data||{};";
+			buf+="var p=[];";
+			buf+="with(data) {"+
+					"p.push('" +
+						tpl
+							.replace(/\\/g,"\\\\")
+							.replace(/[\r\t\n]/g," ")
+							.split("<%").join("\t")
+							.replace(/((^|%>)[^\t]*)'/g,"$1\r")
+							.replace(/\t=(.*?)%>/g,"',$1,'")
+							.split("\t").join("');")
+							.split("%>").join("p.push('")
+							.split("\r").join("\\'")+
+					"');"+
+				"};"+
+				"return p.join('');";
+			return buf;
+		};
+
+		this.parse=function(tpl,options) {
+			tpl=this.__shell(tpl);
+			tpl=this.__pure(tpl,options);
+
+			this.render=new Function('data',tpl);
 			return this;
 		};
 	};
