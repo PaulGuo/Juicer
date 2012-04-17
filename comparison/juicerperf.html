@@ -7,7 +7,6 @@
 </head>
 <body>
 	<script type="text/javascript">
-		var start=new Date().getTime();
 		var data={
 			list:[
 				{name:'guokai',show:true},
@@ -28,28 +27,31 @@
 		};
 		var tpl=[
 			'<ul>',
-				'{@for list}',
-					'<li>[#name] {@if [#show]}-{@/if} [#name condition="[#show]"]</li>',
-					'{@if [#show]}SHOW: TRUE{@/if}',
-				'{@/for}',
-				'{@for blah}',
+				'{@each data.list as it}',
+					'<li>${it.name} (index: ${.})</li>',
+				'{@/each}',
+				'{@each data.blah as it}',
 					'<li>',
-						'num:[#num] <br/>',
-						'{@if [#num]==3}',
-							'{@for inner}[#time]<br />{@/for}',
+						'num: ${it.num} <br />',
+						'{@if it.num==3}',
+							'{@each it.inner as it2}',
+								'${it2.time} <br />',
+							'{@/each}',
 						'{@/if}',
 					'</li>',
-				'{@/for}',
+				'{@/each}',
 			'</ul>'
 		].join('');
+		var starttimestamp=new Date().getTime();
 		for(var i=0;i<1000;i++) {
-			juicer(tpl,data);
+			juicer.to_html(tpl,data);
 		}
-		var end=new Date().getTime();
+		var endtimestamp=new Date().getTime();
+		var exhausttime=endtimestamp-starttimestamp;
 		document.write('<style>body,p {font-family:cambria;}</style>');
 		document.write('<p><strong>Juicer Performance Test</strong></p>');
-		document.write('<p>run time: '+(end-start)+'ms</p>');
-		document.write(juicer(tpl,data));
+		document.write('<p>run time: '+exhausttime+'ms</p>');
+		document.write(juicer.to_html(tpl,data));
 	</script>
 </body>
 </html>
