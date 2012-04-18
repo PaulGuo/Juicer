@@ -52,20 +52,22 @@
 							'('+
 								fn+
 									'('+
-										(varname!=='.'?varname:'i')+
+										varname+
 									')'+
 							')'+
 					' %>';
 		};
 	
 		this.__shell=function(tpl) {
+			var iterate_count=0;
 			tpl=tpl
 				//for expression
 				.replace(juicer.settings.forstart,function($,varname,alias,key) {
 					var alias=alias||'value',key=key && key.substr(1);
-					return '<% for(var i=0,l='+varname+'.length;i<l;i++) {'+
-								'var '+alias+'='+varname+'[i];'+
-								(key?('var '+key+'='+'i;'):'')+
+					var iterate_var='i'+iterate_count++;
+					return '<% for(var '+iterate_var+'=0,l='+varname+'.length;'+iterate_var+'<l;'+iterate_var+'++) {'+
+								'var '+alias+'='+varname+'['+iterate_var+'];'+
+								(key?('var '+key+'='+iterate_var+';'):'')+
 							' %>';
 				})
 				.replace(juicer.settings.forend,'<% } %>')

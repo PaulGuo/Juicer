@@ -27,8 +27,8 @@
 		};
 		var tpl=[
 			'<ul>',
-				'{@each data.list as it}',
-					'<li>${it.name} (index: ${.})</li>',
+				'{@each data.list as it,k}',
+					'<li>${it.name} (index: ${k})</li>',
 				'{@/each}',
 				'{@each data.blah as it}',
 					'<li>',
