@@ -45,7 +45,7 @@
 			var __define=varname.split('|'),fn='';
 			if(__define.length>1) {
 				varname=__define.shift();
-				func=__define.shift();
+				fn=__define.shift();
 			}
 			return '<%= '+
 						(escape?'__escapehtml.__escape':'')+
