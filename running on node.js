@@ -22,12 +22,12 @@ var data={
 
 var tpl=[
 	'<ul>',
-		'{@for data.list as it}',
-			'<li>${.} - $${it.name} {@if it.show} ${it.name} {@/if}</li>',
+		'{@for data.list as it,k}',
+			'<li>${k} - $${it.name} {@if it.show} ${it.name} {@/if}</li>',
 		'{@/for}',
-		'{@for data.blah as it}',
+		'{@for data.blah as it,k}',
 			'<li>',
-				'${.} - num:${it.num}<br/>',
+				'${k} - num:${it.num}<br/>',
 				'{@if it.num==3}',
 					'{@for it.inner as it2}',
 						'${it2.time}<br />',
