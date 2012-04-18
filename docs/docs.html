@@ -9,12 +9,12 @@
 
 <h2>Juicer Docs</h2>
 
-<p>juicer is a fast lightweight javascript template engine, you can use it to split the data and the html structure. it can 
-also running via node.js as demo below.</p>
+<p>juicer is a high-performance lightweight javascript template engine, the benefits of using juicer is that you can 
+seperate your data and the html structure. it can also running on node.js environment.</p>
 
 <h4>the name of juicer</h4>
 
-<p>data(json) like fruits, template like water, combine them with juicer.</p>
+<p>if the data is fruit, the template compared to water, through the juicer will be able to put them mixed into html code.</p>
 
 <h4>import juicer.js</h4>
 
@@ -23,29 +23,29 @@ also running via node.js as demo below.</p>
 
 <h2>* License</h2>
 
-<p>JavaScript Garden is published under the <a href="https://github.com/PaulGuo/Juicer/LICENCE">MIT license</a> and hosted on
-<a href="https://github.com/PaulGuo/Juicer">GitHub</a>. If you find errors or typos please <a href="https://github.com/PaulGuo/Juicer/issues">file an issue</a> or a pull 
-request on the repository.</p>
+<p>juicer is published under the <a href="https://github.com/PaulGuo/Juicer/LICENCE">apache license</a> and hosted on
+<a href="https://github.com/PaulGuo/Juicer">GitHub</a>. if you find errors or typos please 
+<a href="https://github.com/PaulGuo/Juicer/issues">file an issue</a> or a pull request on the repository.</p>
 
-<h2>* api</h2>
+<h2>* API</h2>
 
-<p>compile and render the template with given data.</p>
+<p>&gt; compile and render the template with given data immediately.</p>
 
 <pre><code>juicer.to_html(tpl,data,options);
 </code></pre>
 
-<p>only compile the template.</p>
+<p>&gt; only compile the template, it'll return a reusable function for the given `template`.</p>
 
 <pre><code>var tpl=juicer.compile(tpl,options);
 </code></pre>
 
-<p>render the template using complied template.</p>
+<p>&gt; render the complied template with given data.</p>
 
 <pre><code>var tpl=juicer.compile(tpl,options);
 var html=tpl.render(data);
 </code></pre>
 
-<h4>options</h4>
+<h4>Options</h4>
 
 <pre><code>{
 	cache:true/false,
@@ -53,9 +53,9 @@ var html=tpl.render(data);
 }
 </code></pre>
 
-<p>cache means that whether to cache the compiled template.</p>
+<p>cache in the options means that whether cache the pre-compiled templates.</p>
 
-<h2>* syntax</h2>
+<h2>* Syntax</h2>
 
 <h4>a. ${var}</h4>
 
@@ -63,6 +63,23 @@ var html=tpl.render(data);
 
 <pre><code>${data.name}
 ${data.name|function}
+</code></pre>
+
+<p>let's use a demo to illustrate this usage.</p>
+
+<pre><code>var json={
+	name:'benben',
+	age:23
+};
+
+var inc=function(number) {
+	return number+1;
+};
+
+//it'll be 'benben'
+juicer.to_html('${data.name}',json);
+//it'll be 24
+juicer.to_html('${data.age|inc}',json);
 </code></pre>
 
 <h4>b. {@each} ... {@/each}</h4>
@@ -96,7 +113,7 @@ ${data.name|function}
 {@/each}
 </code></pre>
 
-<h2>* running via node.js</h2>
+<h2>* running on the node.js environment</h2>
 
 <pre><code>var juicer=require('./juicer');
 var html=juicer.to_html(tpl,data,options);
