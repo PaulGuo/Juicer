@@ -44,8 +44,8 @@
 				<span>`Template String:</span>
 				<pre class="J_tpl">
 &lt;ul&gt;
-	{@each data.list as it}
-		&lt;li&gt;${it.name} (index: ${.})&lt;/li&gt;
+	{@each data.list as it,k}
+		&lt;li&gt;${it.name} (index: ${k})&lt;/li&gt;
 	{@/each}
 	{@each data.blah as it}
 		&lt;li&gt;
