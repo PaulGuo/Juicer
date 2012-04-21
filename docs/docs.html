@@ -24,7 +24,7 @@ seperate your data and the html structure. it can also running on node.js enviro
 <h2>* License</h2>
 
 <p>juicer is published under the <a href="https://github.com/PaulGuo/Juicer/LICENCE">apache license</a> and hosted on
-<a href="https://github.com/PaulGuo/Juicer">GitHub</a>. if you find errors or typos please 
+<a href="https://github.com/PaulGuo/Juicer">github</a>. if you find errors or typos please 
 <a href="https://github.com/PaulGuo/Juicer/issues">file an issue</a> or a pull request on the repository.</p>
 
 <h2>* API</h2>
@@ -82,17 +82,32 @@ juicer.to_html('${data.name}',json);
 juicer.to_html('${data.age|inc}',json);
 </code></pre>
 
+<strong>escape/unescape</strong>
+
+<p>it is noteworthy that, for security reasons, ${output} will do escape to the output, if you do not want it to be escaped, you can use $${output} to avoid this. 
+for example:</p>
+
+<pre><code>var json={
+	value:'&lt;strong&gt;juicer&lt;/strong&gt;'
+};
+
+var escapetpl='${data.value}';
+var unescapetpl='$${data.value}';
+
+juicer.to_html(escapetpl,json); //it'll be '&amp;lt;strong&amp;gt;juicer&amp;lt;/strong&amp;gt;'
+juicer.to_html(unescapetpl,json); //it'll be '&lt;strong&gt;juicer&lt;/strong&gt;'
+</code></pre>
+
 <h4>b. {@each} ... {@/each}</h4>
 
 <p>when you need iterate a list, you can use `each` like this.</p>
 
 <pre><code>{@each data.list as item}
 	${item.prop}
-	${.} //index
 {@/each}
 </code></pre>
 
-<p>you can also custom the index name.</p>
+<p>you can also get the index while eaching.</p>
 
 <pre><code>{@each data.list as item,index}
 	${item.prop}
@@ -115,7 +130,8 @@ juicer.to_html('${data.age|inc}',json);
 
 <h2>* running on the node.js environment</h2>
 
-<pre><code>var juicer=require('./juicer');
+<pre><code>bash: npm install juicer
+var juicer=require('juicer');
 var html=juicer.to_html(tpl,data,options);
 </code></pre>
 
