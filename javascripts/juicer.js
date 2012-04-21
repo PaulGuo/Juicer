@@ -92,6 +92,9 @@
 				//clean up comments
 				.replace(juicer.settings.inlinecomment,'');
 
+			//exception handling
+			tpl='<% try { %>'+tpl+'<% } catch(e) {console.warn("Juicer Render Exception: "+e.message);} %>';
+
 			return tpl;
 		};
 
@@ -153,9 +156,14 @@
 	};
 
 	juicer.compile=function(tpl,options) {
-		var engine=__cache[tpl]?__cache[tpl]:new this.template().parse(tpl,options);
-		if(!options || options.cache!==false) __cache[tpl]=engine;
-		return engine;
+		try {
+			var engine=__cache[tpl]?__cache[tpl]:new this.template().parse(tpl,options);
+			if(!options || options.cache!==false) __cache[tpl]=engine;
+			return engine;
+		} catch(e) {
+			console.warn('Juicer Compile Exception: '+e.message);
+			return {render:function() {}};
+		}
 	};
 
 	juicer.to_html=function(tpl,data,options) {
