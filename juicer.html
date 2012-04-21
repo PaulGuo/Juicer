@@ -30,6 +30,7 @@
 				'{@each data.list as it,k}',
 					'<li>${it.name} (index: ${k})</li>',
 				'{@/each}',
+				'{# first level attribute must specify the "data." prefix}',
 				'{@each data.blah as it}',
 					'<li>',
 						'num: ${it.num} <br />',

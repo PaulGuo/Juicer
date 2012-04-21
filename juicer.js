@@ -35,7 +35,8 @@
 		ifend:/{@\/if}/igm,
 		elsestart:/{@else}/igm,
 		interpolate:/\${([\s\S]+?)}/igm,
-		noneencode:/\$\${([\s\S]+?)}/igm
+		noneencode:/\$\${([\s\S]+?)}/igm,
+		inlinecomment:/{#[^}]*?}/igm
 	};
 
 	juicer.template=function() {
@@ -87,7 +88,9 @@
 				//interpolate with escape
 				.replace(juicer.settings.interpolate,function($,varname) {
 					return __this.__interpolate(varname,true);
-				});
+				})
+				//clean up comments
+				.replace(juicer.settings.inlinecomment,'');
 
 			return tpl;
 		};
