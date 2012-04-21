@@ -59,7 +59,7 @@
 					' %>';
 		};
 	
-		this.__shell=function(tpl) {
+		this.__shell=function(tpl,options) {
 			var iterate_count=0;
 			tpl=tpl
 				//for expression
@@ -93,7 +93,9 @@
 				.replace(juicer.settings.inlinecomment,'');
 
 			//exception handling
-			tpl='<% try { %>'+tpl+'<% } catch(e) {console.warn("Juicer Render Exception: "+e.message);} %>';
+			if(!options || options.errorhandling!==false) {
+				tpl='<% try { %>'+tpl+'<% } catch(e) {console.warn("Juicer Render Exception: "+e.message);} %>';
+			}
 
 			return tpl;
 		};
@@ -147,7 +149,7 @@
 		};
 
 		this.parse=function(tpl,options) {
-			tpl=this.__shell(tpl);
+			tpl=this.__shell(tpl,options);
 			tpl=this.__pure(tpl,options);
 
 			this.render=new Function('data',tpl);
