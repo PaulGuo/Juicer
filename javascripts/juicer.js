@@ -24,7 +24,10 @@
 			return __escapehtml.__escapehash[k];
 		},
 		__escape:function(str) {
-			return typeof(str)!=='string'?str:str.replace(/[&<>"]/igm,__escapehtml.__escapereplace);
+			return typeof(str)!=='string'?__escapehtml.__detection(str):str.replace(/[&<>"]/igm,__escapehtml.__escapereplace);
+		},
+		__detection:function(data) {
+			return typeof(data)==='undefined'?'':data;
 		}
 	};
 
@@ -49,7 +52,7 @@
 				fn=__define.shift();
 			}
 			return '<%= '+
-						(escape?'__escapehtml.__escape':'')+
+						(escape?'__escapehtml.__escape':'__escapehtml.__detection')+
 							'('+
 								fn+
 									'('+
