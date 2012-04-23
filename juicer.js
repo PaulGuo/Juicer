@@ -24,7 +24,7 @@
 			return __escapehtml.__escapehash[k];
 		},
 		__escape:function(str) {
-			return typeof(str)!=='string'?__escapehtml.__detection(str):str.replace(/[&<>"]/igm,__escapehtml.__escapereplace);
+			return typeof(str)!=='string'?str:str.replace(/[&<>"]/igm,__escapehtml.__escapereplace);
 		},
 		__detection:function(data) {
 			return typeof(data)==='undefined'?'':data;
@@ -45,20 +45,23 @@
 	juicer.template=function() {
 		var __this=this;
 	
-		this.__interpolate=function(varname,escape) {
+		this.__interpolate=function(varname,escape,options) {
 			var __define=varname.split('|'),fn='';
 			if(__define.length>1) {
 				varname=__define.shift();
 				fn=__define.shift();
 			}
 			return '<%= '+
-						(escape?'__escapehtml.__escape':'__escapehtml.__detection')+
-							'('+
-								fn+
+						(escape?'__escapehtml.__escape':'')+
+							(!options || options.detection!==false?'__escapehtml.__detection':'')+
+								'('+
 									'('+
-										varname+
+										fn+
+											'('+
+												varname+
+											')'+
 									')'+
-							')'+
+								')'+
 					' %>';
 		};
 	
@@ -86,11 +89,11 @@
 				})
 				//interpolate without escape
 				.replace(juicer.settings.noneencode,function($,varname) {
-					return __this.__interpolate(varname,false);
+					return __this.__interpolate(varname,false,options);
 				})
 				//interpolate with escape
 				.replace(juicer.settings.interpolate,function($,varname) {
-					return __this.__interpolate(varname,true);
+					return __this.__interpolate(varname,true,options);
 				})
 				//clean up comments
 				.replace(juicer.settings.inlinecomment,'');
