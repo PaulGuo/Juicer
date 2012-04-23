@@ -53,15 +53,15 @@
 			}
 			return '<%= '+
 						(escape?'__escapehtml.__escape':'')+
-							(!options || options.detection!==false?'__escapehtml.__detection':'')+
-								'('+
+							'('+
+								(!options || options.detection!==false?'__escapehtml.__detection':'')+
 									'('+
 										fn+
 											'('+
 												varname+
 											')'+
 									')'+
-								')'+
+							')'+
 					' %>';
 		};
 	
