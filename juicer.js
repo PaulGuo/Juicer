@@ -120,7 +120,7 @@
 			var buf=[].join('');
 			buf+="var data=data||{};";
 			buf+="var out='';out+='";
-			if(!strip) {
+			if(strip) {
 				buf+=tpl
 						.replace(/\\/g,"\\\\")
 						.replace(/[\r\t\n]/g," ")
@@ -152,7 +152,7 @@
 			var buf=[].join('');
 			buf+="var data=data||{};";
 			buf+="var p=[];";
-			if(!strip) {
+			if(strip) {
 				buf+="with(data) {"+
 						"p.push('" +
 							tpl
