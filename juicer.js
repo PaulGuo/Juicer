@@ -3,12 +3,12 @@
 	@email/gtalk: badkaikai@gmail.com
 	@blog/website: http://benben.cc
 	@license: apache license,version 2.0
-	@version: 0.2.2
+	@version: 0.2.3
 */
 
 (function() {
 	var juicer={
-		version:'0.2.2'
+		version:'0.2.3'
 	};
 
 	this.__cache={};
@@ -108,49 +108,83 @@
 
 		this.__pure=function(tpl,options) {
 			if(options && options.loose===true) {
-				buf=this.__looseconvert(tpl);
+				buf=this.__looseconvert(tpl,options && options.strip);
 			} else {
-				buf=this.__convert(tpl);
+				buf=this.__convert(tpl,options && options.strip);
 			}
 
 			return buf;
 		};
 
-		this.__convert=function(tpl) {
+		this.__convert=function(tpl,strip) {
 			var buf=[].join('');
 			buf+="var data=data||{};";
 			buf+="var out='';out+='";
-			buf+=tpl
-					.replace(/\\/g,"\\\\")
-					.replace(/[\r\t\n]/g," ")
-					.replace(/'(?=[^%]*%>)/g,"\t")
-					.split("'").join("\\'")
-					.split("\t").join("'")
-					.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
-					.split("<%").join("';")
-					.split("%>").join("out+='")+
-					"';return out;";
+			if(!strip) {
+				buf+=tpl
+						.replace(/\\/g,"\\\\")
+						.replace(/[\r\t\n]/g," ")
+						.replace(/'(?=[^%]*%>)/g,"\t")
+						.split("'").join("\\'")
+						.split("\t").join("'")
+						.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
+						.split("<%").join("';")
+						.split("%>").join("out+='")+
+						"';return out;";
+			} else {
+				buf+=tpl
+						.replace(/\\/g,"\\\\")
+						.replace(/[\r]/g,"\\r")
+						.replace(/[\t]/g,"\\t")
+						.replace(/[\n]/g,"\\n")
+						.replace(/'(?=[^%]*%>)/g,"\t")
+						.split("'").join("\\'")
+						.split("\t").join("'")
+						.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
+						.split("<%").join("';")
+						.split("%>").join("out+='")+
+						"';return out.replace(/[\\r\\n]\\t+[\\r\\n]/g,'\\r\\n');";
+			}
 			return buf;
 		};
 
-		this.__looseconvert=function(tpl) {
+		this.__looseconvert=function(tpl,strip) {
 			var buf=[].join('');
 			buf+="var data=data||{};";
 			buf+="var p=[];";
-			buf+="with(data) {"+
-					"p.push('" +
-						tpl
-							.replace(/\\/g,"\\\\")
-							.replace(/[\r\t\n]/g," ")
-							.split("<%").join("\t")
-							.replace(/((^|%>)[^\t]*)'/g,"$1\r")
-							.replace(/\t=(.*?)%>/g,"',$1,'")
-							.split("\t").join("');")
-							.split("%>").join("p.push('")
-							.split("\r").join("\\'")+
-					"');"+
-				"};"+
-				"return p.join('');";
+			if(!strip) {
+				buf+="with(data) {"+
+						"p.push('" +
+							tpl
+								.replace(/\\/g,"\\\\")
+								.replace(/[\r\t\n]/g," ")
+								.split("<%").join("\t")
+								.replace(/((^|%>)[^\t]*)'/g,"$1\r")
+								.replace(/\t=(.*?)%>/g,"',$1,'")
+								.split("\t").join("');")
+								.split("%>").join("p.push('")
+								.split("\r").join("\\'")+
+						"');"+
+					"};"+
+					"return p.join('');";
+			} else {
+				buf+="with(data) {"+
+						"p.push('" +
+							tpl
+								.replace(/\\/g,"\\\\")
+								.replace(/[\r]/g,"\\r")
+								.replace(/[\t]/g,"\\t")
+								.replace(/[\n]/g,"\\n")
+								.split("<%").join("\t")
+								.replace(/((^|%>)[^\t]*)'/g,"$1\r")
+								.replace(/\t=(.*?)%>/g,"',$1,'")
+								.split("\t").join("');")
+								.split("%>").join("p.push('")
+								.split("\r").join("\\'")+
+						"');"+
+					"};"+
+					"return p.join('').replace(/[\\r\\n]\\t+[\\r\\n]/g,'\\r\\n');";
+			}
 			return buf;
 		};
 
