@@ -108,9 +108,9 @@
 
 		this.__pure=function(tpl,options) {
 			if(options && options.loose===true) {
-				buf=this.__looseconvert(tpl,options && options.strip);
+				buf=this.__looseconvert(tpl,!options || options.strip);
 			} else {
-				buf=this.__convert(tpl,options && options.strip);
+				buf=this.__convert(tpl,!options || options.strip);
 			}
 
 			return buf;
