@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="GBK">
+	<title></title>
+	<script type="text/javascript" src="http://a.tbcdn.cn/??s/yui/3.3.0/build/yui/yui-min.js,s/yui/3.3.0/build/loader/loader-min.js"></script>
+	<script type="text/javascript" src="yui-juicer.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+YUI().use('juicer',function(Y) {
+	console.log(Y.juicer.to_html('${data.v}',{v:123}));
+});
+</script>
+
+</body>
+</html>
