@@ -101,7 +101,7 @@ YUI.add('juicer',function(Y) {
 
 				//exception handling
 				if(!options || options.errorhandling!==false) {
-					tpl='<% try { %>'+tpl+'<% } catch(e) {console.warn("Juicer Render Exception: "+e.message);} %>';
+					tpl='<% try { %>'+tpl+'<% } catch(e) {console && console.warn("Juicer Render Exception: "+e.message);} %>';
 				}
 
 				return tpl;
@@ -204,7 +204,7 @@ YUI.add('juicer',function(Y) {
 				if(!options || options.cache!==false) __cache[tpl]=engine;
 				return engine;
 			} catch(e) {
-				console.warn('Juicer Compile Exception: '+e.message);
+				console && console.warn('Juicer Compile Exception: '+e.message);
 				return {render:function() {}};
 			}
 		};
