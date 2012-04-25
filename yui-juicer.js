@@ -121,7 +121,7 @@ YUI.add('juicer',function(Y) {
 				var buf=[].join('');
 				buf+="var data=data||{};";
 				buf+="var out='';out+='";
-				if(strip) {
+				if(strip!==false) {
 					buf+=tpl
 							.replace(/\\/g,"\\\\")
 							.replace(/[\r\t\n]/g," ")
@@ -153,7 +153,7 @@ YUI.add('juicer',function(Y) {
 				var buf=[].join('');
 				buf+="var data=data||{};";
 				buf+="var p=[];";
-				if(strip) {
+				if(strip!==false) {
 					buf+="with(data) {"+
 							"p.push('" +
 								tpl
