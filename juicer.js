@@ -39,7 +39,8 @@
 		elsestart:/{@else}/igm,
 		interpolate:/\${([\s\S]+?)}/igm,
 		noneencode:/\$\${([\s\S]+?)}/igm,
-		inlinecomment:/{#[^}]*?}/igm
+		inlinecomment:/{#[^}]*?}/igm,
+		rangestart:/{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
 	};
 
 	juicer.template=function() {
@@ -96,7 +97,14 @@
 					return __this.__interpolate(varname,true,options);
 				})
 				//clean up comments
-				.replace(juicer.settings.inlinecomment,'');
+				.replace(juicer.settings.inlinecomment,'')
+				//range expression
+				.replace(juicer.settings.rangestart,function($,varname,start,end) {
+					var iterate_var='j'+iterate_count++;
+					return '<% for(var '+iterate_var+'=0;'+iterate_var+'<'+(end-start)+';'+iterate_var+'++) {'+
+								'var '+varname+'='+iterate_var+';'+
+							' %>';
+				});
 
 			//exception handling
 			if(!options || options.errorhandling!==false) {
