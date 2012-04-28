@@ -27,11 +27,11 @@
 		};
 		var tpl=[
 			'<ul>',
-				'{@each data.list as it,k}',
+				'{@each list as it,k}',
 					'<li>${it.name} (index: ${k})</li>',
 				'{@/each}',
 				'{# first level attribute must specify the "data." prefix}',
-				'{@each data.blah as it}',
+				'{@each blah as it}',
 					'<li>',
 						'num: ${it.num} <br />',
 						'{@if it.num==3}',

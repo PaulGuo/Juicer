@@ -7,11 +7,10 @@
 */
 
 (function() {
-	var juicer={
-		version:'0.3.0-dev'
+	var juicer=function() {
+		if(arguments.length==1) return juicer.compile.apply(juicer,arguments);
+		if(arguments.length>=2) return juicer.to_html.apply(juicer,arguments);
 	};
-
-	this.__cache={};
 
 	this.__escapehtml={
 		__escapehash:{
@@ -31,6 +30,9 @@
 		}
 	};
 
+	juicer.__cache={};
+	juicer.version='0.3.0-dev';
+
 	juicer.settings = {
 		forstart:/{@each\s*([\w\.]*?)\s*as\s*(\w*?)(,\w*?)?}/igm,
 		forend:/{@\/each}/igm,
@@ -41,6 +43,16 @@
 		noneencode:/\$\${([\s\S]+?)}/igm,
 		inlinecomment:/{#[^}]*?}/igm,
 		rangestart:/{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
+	};
+
+	juicer.options={
+		cache:true,
+		strip:true,
+		errorhandling:true
+	};
+
+	juicer.set=function(conf,value) {
+		this.options[conf]=value;
 	};
 
 	juicer.template=function() {
@@ -180,8 +192,8 @@
 
 	juicer.compile=function(tpl,options) {
 		try {
-			var engine=__cache[tpl]?__cache[tpl]:new this.template().parse(tpl,options);
-			if(!options || options.cache!==false) __cache[tpl]=engine;
+			var engine=this.__cache[tpl]?this.__cache[tpl]:new this.template().parse(tpl,options);
+			if(!options || options.cache!==false) this.__cache[tpl]=engine;
 			return engine;
 		} catch(e) {
 			console && console.warn('Juicer Compile Exception: '+e.message);
