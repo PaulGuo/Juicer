@@ -3,12 +3,12 @@
 	@email/gtalk: badkaikai@gmail.com
 	@blog/website: http://benben.cc
 	@license: apache license,version 2.0
-	@version: 0.2.3
+	@version: 0.3.0-dev
 */
 
 (function() {
 	var juicer={
-		version:'0.2.3'
+		version:'0.3.0-dev'
 	};
 
 	this.__cache={};
@@ -45,7 +45,7 @@
 
 	juicer.template=function() {
 		var __this=this;
-	
+
 		this.__interpolate=function(varname,escape,options) {
 			var __define=varname.split('|'),fn='';
 			if(__define.length>1) {
@@ -65,7 +65,7 @@
 							')'+
 					' %>';
 		};
-	
+
 		this.__shell=function(tpl,options) {
 			var iterate_count=0;
 			tpl=tpl
@@ -115,13 +115,25 @@
 		};
 
 		this.__pure=function(tpl,options) {
-			if(options && options.loose===true) {
-				var buf=this.__looseconvert(tpl,!options || options.strip);
-			} else {
-				var buf=this.__convert(tpl,!options || options.strip);
-			}
+			return this.__convert(tpl,!options || options.strip);;
+		};
 
-			return buf;
+		this.__lexical=function(tpl) {
+			var buf=[];
+			var pre='';
+			var memo=function($,variable) {
+				variable=variable.match(/\w+/igm)[0];
+				buf.indexOf(variable)===-1 && buf.push(variable);
+			};
+
+			tpl.replace(juicer.settings.forstart,memo).
+				replace(juicer.settings.interpolate,memo).
+				replace(juicer.settings.ifstart,memo);
+
+			for(var i=0;i<buf.length;i++) {
+				pre+='var '+buf[i]+'=data.'+buf[i]+';';
+			}
+			return '<% '+pre+' %>';
 		};
 
 		this.__convert=function(tpl,strip) {
@@ -156,47 +168,8 @@
 			return buf;
 		};
 
-		this.__looseconvert=function(tpl,strip) {
-			var buf=[].join('');
-			buf+="var data=data||{};";
-			buf+="var p=[];";
-			if(strip!==false) {
-				buf+="with(data) {"+
-						"p.push('" +
-							tpl
-								.replace(/\\/g,"\\\\")
-								.replace(/[\r\t\n]/g," ")
-								.split("<%").join("\t")
-								.replace(/((^|%>)[^\t]*)'/g,"$1\r")
-								.replace(/\t=(.*?)%>/g,"',$1,'")
-								.split("\t").join("');")
-								.split("%>").join("p.push('")
-								.split("\r").join("\\'")+
-						"');"+
-					"};"+
-					"return p.join('');";
-			} else {
-				buf+="with(data) {"+
-						"p.push('" +
-							tpl
-								.replace(/\\/g,"\\\\")
-								.replace(/[\r]/g,"\\r")
-								.replace(/[\t]/g,"\\t")
-								.replace(/[\n]/g,"\\n")
-								.split("<%").join("\t")
-								.replace(/((^|%>)[^\t]*)'/g,"$1\r")
-								.replace(/\t=(.*?)%>/g,"',$1,'")
-								.split("\t").join("');")
-								.split("%>").join("p.push('")
-								.split("\r").join("\\'")+
-						"');"+
-					"};"+
-					"return p.join('').replace(/[\\r\\n]\\t+[\\r\\n]/g,'\\r\\n');";
-			}
-			return buf;
-		};
-
 		this.parse=function(tpl,options) {
+			tpl=this.__lexical(tpl)+tpl;
 			tpl=this.__shell(tpl,options);
 			tpl=this.__pure(tpl,options);
 
