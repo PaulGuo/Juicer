@@ -8,6 +8,8 @@
 
 (function() {
 	var juicer=function() {
+		arguments[arguments.length]=juicer.options;
+		arguments.length=arguments.length+1;
 		if(arguments.length==1) return juicer.compile.apply(juicer,arguments);
 		if(arguments.length>=2) return juicer.to_html.apply(juicer,arguments);
 	};
