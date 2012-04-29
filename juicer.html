@@ -47,12 +47,13 @@
 			return n+1;
 		};
 		var starttimestamp=new Date().getTime();
+		juicer.set('cache',true);
 		for(var i=0;i<1000;i++) {
-			juicer.to_html(tpl,data,{cache:false});
+			juicer(tpl,data);
 		}
 		var endtimestamp=new Date().getTime();
 		var exhausttime=endtimestamp-starttimestamp;
-		document.write(juicer.to_html(tpl,data));
+		document.write(juicer(tpl,data));
 		document.write('run time: '+exhausttime);
 	</script>
 </body>
