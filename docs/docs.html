@@ -9,6 +9,8 @@
 
 <h2>Juicer Docs</h2>
 
+<p><strong>current version: 0.3.0-dev</strong></p>
+
 <p>juicer is a high-performance lightweight javascript template engine, the benefits of using juicer is that you can 
 seperate your data and the html structure. it can also running on node.js environment.</p>
 
@@ -31,17 +33,24 @@ seperate your data and the html structure. it can also running on node.js enviro
 
 <p>&gt; compile and render the template with given data immediately.</p>
 
-<pre><code>juicer.to_html(tpl,data,options);
+<pre><code>juicer(tpl,data);
+--- OR ---
+juicer.to_html(tpl,data);
 </code></pre>
 
 <p>&gt; only compile the template, it'll return a reusable function for the given `template`.</p>
 
-<pre><code>var tpl=juicer.compile(tpl,options);
+<pre><code>var tpl=juicer(tpl);
+--- OR ---
+var tpl=juicer.compile(tpl);
 </code></pre>
 
 <p>&gt; render the complied template with given data.</p>
 
-<pre><code>var tpl=juicer.compile(tpl,options);
+<pre><code>var tpl=juicer(tpl);
+var html=tpl.render(data);
+--- OR ---
+var tpl=juicer.compile(tpl,options);
 var html=tpl.render(data);
 </code></pre>
 
@@ -49,9 +58,15 @@ var html=tpl.render(data);
 
 <pre><code>{
 	cache:true/false,
-	loose:false/true,
+	strip:true/false,
 	errorhandling:true/false
 }
+</code></pre>
+
+<p>if you wanna change the default options, you can do like this:</p>
+
+<pre><code>juicer.set('strip',false);
+juicer.set('cache',false);
 </code></pre>
 
 <p>cache in the options means that whether cache the pre-compiled templates.</p>
@@ -62,8 +77,8 @@ var html=tpl.render(data);
 
 <p>using ${} to evaluating expressions and functions.</p>
 
-<pre><code>${data.name}
-${data.name|function}
+<pre><code>${name}
+${name|function}
 </code></pre>
 
 <p>let's use a demo to illustrate this usage.</p>
@@ -78,9 +93,9 @@ var inc=function(number) {
 };
 
 //it'll be 'benben'
-juicer.to_html('${data.name}',json);
+juicer.to_html('${name}',json);
 //it'll be 24
-juicer.to_html('${data.age|inc}',json);
+juicer.to_html('${age|inc}',json);
 </code></pre>
 
 <strong>escape/unescape</strong>
@@ -92,25 +107,25 @@ for example:</p>
 	value:'&lt;strong&gt;juicer&lt;/strong&gt;'
 };
 
-var escapetpl='${data.value}';
-var unescapetpl='$${data.value}';
+var escapetpl='${value}';
+var unescapetpl='$${value}';
 
-juicer.to_html(escapetpl,json); //it'll be '&amp;lt;strong&amp;gt;juicer&amp;lt;/strong&amp;gt;'
-juicer.to_html(unescapetpl,json); //it'll be '&lt;strong&gt;juicer&lt;/strong&gt;'
+juicer(escapetpl,json); //it'll be '&amp;lt;strong&amp;gt;juicer&amp;lt;/strong&amp;gt;'
+juicer(unescapetpl,json); //it'll be '&lt;strong&gt;juicer&lt;/strong&gt;'
 </code></pre>
 
 <h4>b. {@each} ... {@/each}</h4>
 
 <p>when you need iterate a list, you can use `each` like this.</p>
 
-<pre><code>{@each data.list as item}
+<pre><code>{@each list as item}
 	${item.prop}
 {@/each}
 </code></pre>
 
 <p>you can also get the index while eaching.</p>
 
-<pre><code>{@each data.list as item,index}
+<pre><code>{@each list as item,index}
 	${item.prop}
 	${index} //index
 {@/each}
@@ -120,7 +135,7 @@ juicer.to_html(unescapetpl,json); //it'll be '&lt;strong&gt;juicer&lt;/strong&gt
 
 <p>you can also use if-else if you need.</p>
 
-<pre><code>{@each data.list as item,index}
+<pre><code>{@each list as item,index}
 	{@if index===3}
 		the index is 3, the value is ${item.prop}
 	{@else}
@@ -139,16 +154,16 @@ juicer.to_html(unescapetpl,json); //it'll be '&lt;strong&gt;juicer&lt;/strong&gt
 
 <pre><code>bash: npm install juicer
 var juicer=require('juicer');
-var html=juicer.to_html(tpl,data,options);
+var html=juicer(tpl,data);
 </code></pre>
 
 <h2>* demo</h2>
 
 <pre><code>&lt;ul&gt;
-	{@each data.list as it,index}
+	{@each list as it,index}
 		&lt;li&gt;${it.name} (index: ${index})&lt;/li&gt;
 	{@/each}
-	{@each data.blah as it}
+	{@each blah as it}
 		&lt;li&gt;
 			num: ${it.num} &lt;br /&gt;
 			{@if it.num==3}

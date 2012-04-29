@@ -3,15 +3,14 @@
 	@email/gtalk: badkaikai@gmail.com
 	@blog/website: http://benben.cc
 	@license: apache license,version 2.0
-	@version: 0.2.2
+	@version: 0.3.0-dev
 */
 
 (function() {
-	var juicer={
-		version:'0.2.2'
+	var juicer=function() {
+		if(arguments.length==1) return juicer.compile.apply(juicer,arguments);
+		if(arguments.length>=2) return juicer.to_html.apply(juicer,arguments);
 	};
-
-	this.__cache={};
 
 	this.__escapehtml={
 		__escapehash:{
@@ -24,12 +23,15 @@
 			return __escapehtml.__escapehash[k];
 		},
 		__escape:function(str) {
-			return typeof(str)!=='string'?__escapehtml.__detection(str):str.replace(/[&<>"]/igm,__escapehtml.__escapereplace);
+			return typeof(str)!=='string'?str:str.replace(/[&<>"]/igm,__escapehtml.__escapereplace);
 		},
 		__detection:function(data) {
 			return typeof(data)==='undefined'?'':data;
 		}
 	};
+
+	juicer.__cache={};
+	juicer.version='0.3.0-dev';
 
 	juicer.settings = {
 		forstart:/{@each\s*([\w\.]*?)\s*as\s*(\w*?)(,\w*?)?}/igm,
@@ -39,29 +41,43 @@
 		elsestart:/{@else}/igm,
 		interpolate:/\${([\s\S]+?)}/igm,
 		noneencode:/\$\${([\s\S]+?)}/igm,
-		inlinecomment:/{#[^}]*?}/igm
+		inlinecomment:/{#[^}]*?}/igm,
+		rangestart:/{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
+	};
+
+	juicer.options={
+		cache:true,
+		strip:true,
+		errorhandling:true
+	};
+
+	juicer.set=function(conf,value) {
+		this.options[conf]=value;
 	};
 
 	juicer.template=function() {
 		var __this=this;
-	
-		this.__interpolate=function(varname,escape) {
+
+		this.__interpolate=function(varname,escape,options) {
 			var __define=varname.split('|'),fn='';
 			if(__define.length>1) {
 				varname=__define.shift();
 				fn=__define.shift();
 			}
 			return '<%= '+
-						(escape?'__escapehtml.__escape':'__escapehtml.__detection')+
+						(escape?'__escapehtml.__escape':'')+
 							'('+
-								fn+
+								(!options || options.detection!==false?'__escapehtml.__detection':'')+
 									'('+
-										varname+
+										fn+
+											'('+
+												varname+
+											')'+
 									')'+
 							')'+
 					' %>';
 		};
-	
+
 		this.__shell=function(tpl,options) {
 			var iterate_count=0;
 			tpl=tpl
@@ -86,72 +102,86 @@
 				})
 				//interpolate without escape
 				.replace(juicer.settings.noneencode,function($,varname) {
-					return __this.__interpolate(varname,false);
+					return __this.__interpolate(varname,false,options);
 				})
 				//interpolate with escape
 				.replace(juicer.settings.interpolate,function($,varname) {
-					return __this.__interpolate(varname,true);
+					return __this.__interpolate(varname,true,options);
 				})
 				//clean up comments
-				.replace(juicer.settings.inlinecomment,'');
+				.replace(juicer.settings.inlinecomment,'')
+				//range expression
+				.replace(juicer.settings.rangestart,function($,varname,start,end) {
+					var iterate_var='j'+iterate_count++;
+					return '<% for(var '+iterate_var+'=0;'+iterate_var+'<'+(end-start)+';'+iterate_var+'++) {'+
+								'var '+varname+'='+iterate_var+';'+
+							' %>';
+				});
 
 			//exception handling
 			if(!options || options.errorhandling!==false) {
-				tpl='<% try { %>'+tpl+'<% } catch(e) {console.warn("Juicer Render Exception: "+e.message);} %>';
+				tpl='<% try { %>'+tpl+'<% } catch(e) {console && console.warn("Juicer Render Exception: "+e.message);} %>';
 			}
 
 			return tpl;
 		};
 
 		this.__pure=function(tpl,options) {
-			if(options && options.loose===true) {
-				buf=this.__looseconvert(tpl);
-			} else {
-				buf=this.__convert(tpl);
-			}
-
-			return buf;
+			return this.__convert(tpl,!options || options.strip);;
 		};
 
-		this.__convert=function(tpl) {
+		this.__lexical=function(tpl) {
+			var buf=[];
+			var pre='';
+			var memo=function($,variable) {
+				variable=variable.match(/\w+/igm)[0];
+				buf.indexOf(variable)===-1 && buf.push(variable);
+			};
+
+			tpl.replace(juicer.settings.forstart,memo).
+				replace(juicer.settings.interpolate,memo).
+				replace(juicer.settings.ifstart,memo);
+
+			for(var i=0;i<buf.length;i++) {
+				pre+='var '+buf[i]+'=data.'+buf[i]+';';
+			}
+			return '<% '+pre+' %>';
+		};
+
+		this.__convert=function(tpl,strip) {
 			var buf=[].join('');
 			buf+="var data=data||{};";
 			buf+="var out='';out+='";
-			buf+=tpl
-					.replace(/\\/g,"\\\\")
-					.replace(/[\r\t\n]/g," ")
-					.replace(/'(?=[^%]*%>)/g,"\t")
-					.split("'").join("\\'")
-					.split("\t").join("'")
-					.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
-					.split("<%").join("';")
-					.split("%>").join("out+='")+
-					"';return out;";
-			return buf;
-		};
-
-		this.__looseconvert=function(tpl) {
-			var buf=[].join('');
-			buf+="var data=data||{};";
-			buf+="var p=[];";
-			buf+="with(data) {"+
-					"p.push('" +
-						tpl
-							.replace(/\\/g,"\\\\")
-							.replace(/[\r\t\n]/g," ")
-							.split("<%").join("\t")
-							.replace(/((^|%>)[^\t]*)'/g,"$1\r")
-							.replace(/\t=(.*?)%>/g,"',$1,'")
-							.split("\t").join("');")
-							.split("%>").join("p.push('")
-							.split("\r").join("\\'")+
-					"');"+
-				"};"+
-				"return p.join('');";
+			if(strip!==false) {
+				buf+=tpl
+						.replace(/\\/g,"\\\\")
+						.replace(/[\r\t\n]/g," ")
+						.replace(/'(?=[^%]*%>)/g,"\t")
+						.split("'").join("\\'")
+						.split("\t").join("'")
+						.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
+						.split("<%").join("';")
+						.split("%>").join("out+='")+
+						"';return out;";
+			} else {
+				buf+=tpl
+						.replace(/\\/g,"\\\\")
+						.replace(/[\r]/g,"\\r")
+						.replace(/[\t]/g,"\\t")
+						.replace(/[\n]/g,"\\n")
+						.replace(/'(?=[^%]*%>)/g,"\t")
+						.split("'").join("\\'")
+						.split("\t").join("'")
+						.replace(/<%=(.+?)%>/g,"';out+=$1;out+='")
+						.split("<%").join("';")
+						.split("%>").join("out+='")+
+						"';return out.replace(/[\\r\\n]\\t+[\\r\\n]/g,'\\r\\n');";
+			}
 			return buf;
 		};
 
 		this.parse=function(tpl,options) {
+			tpl=this.__lexical(tpl)+tpl;
 			tpl=this.__shell(tpl,options);
 			tpl=this.__pure(tpl,options);
 
@@ -162,11 +192,11 @@
 
 	juicer.compile=function(tpl,options) {
 		try {
-			var engine=__cache[tpl]?__cache[tpl]:new this.template().parse(tpl,options);
-			if(!options || options.cache!==false) __cache[tpl]=engine;
+			var engine=this.__cache[tpl]?this.__cache[tpl]:new this.template().parse(tpl,options);
+			if(!options || options.cache!==false) this.__cache[tpl]=engine;
 			return engine;
 		} catch(e) {
-			console.warn('Juicer Compile Exception: '+e.message);
+			console && console.warn('Juicer Compile Exception: '+e.message);
 			return {render:function() {}};
 		}
 	};

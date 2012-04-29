@@ -22,7 +22,7 @@
 		<a href="https://github.com/PaulGuo/Juicer/zipball/master#download" class="button" id="downloadbutton">Download</a>
 		<a href="docs/docs.html" class="button" id="docsbutton">Docs</a>
 		<a href="docs/docs.html#!demo" class="button" id="demobutton">Demo</a>
-		<p class="version">v0.2.2</p> 
+		<p class="version">v0.3.0-dev</p> 
 	</div>
 
 	<div id="quotes" class="clearfix">
@@ -44,10 +44,10 @@
 				<span>`Template String:</span>
 				<pre class="J_tpl">
 &lt;ul&gt;
-	{@each data.list as it,k}
+	{@each list as it,k}
 		&lt;li&gt;${it.name} (index: ${k})&lt;/li&gt;
 	{@/each}
-	{@each data.blah as it}
+	{@each blah as it}
 		&lt;li&gt;
 			num: ${it.num} &lt;br /&gt;
 			{@if it.num==3}
