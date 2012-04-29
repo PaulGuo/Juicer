@@ -183,7 +183,7 @@
 		};
 
 		this.parse=function(tpl,options) {
-			tpl=this.__lexical(tpl)+tpl;
+			if(!options || options.loose!==false) tpl=this.__lexical(tpl)+tpl;
 			tpl=this.__shell(tpl,options);
 			tpl=this.__pure(tpl,options);
 
