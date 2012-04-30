@@ -8,10 +8,10 @@
 
 YUI.add('juicer',function(Y) {
 	var juicer=function() {
-		arguments[arguments.length]=juicer.options;
-		arguments.length=arguments.length+1;
-		if(arguments.length==1) return juicer.compile.apply(juicer,arguments);
-		if(arguments.length>=2) return juicer.to_html.apply(juicer,arguments);
+		var args=[].slice.call(arguments);
+		args.push(juicer.options);
+		if(arguments.length==1) return juicer.compile.apply(juicer,args);
+		if(arguments.length>=2) return juicer.to_html.apply(juicer,args);
 	};
 
 	window.__escapehtml={
@@ -186,6 +186,7 @@ YUI.add('juicer',function(Y) {
 			if(!options || options.loose!==false) tpl=this.__lexical(tpl)+tpl;
 			tpl=this.__shell(tpl,options);
 			tpl=this.__pure(tpl,options);
+			tpl='"use strict";'+tpl; //use strict mode
 
 			this.render=new Function('data',tpl);
 			return this;
