@@ -144,7 +144,7 @@ YUI.add('juicer',function(Y) {
 			};
 			var memo=function($,variable) {
 				variable=variable.match(/\w+/igm)[0];
-				buf.indexOf?buf.indexOf(variable):indexOf(buf,variable)===-1 && buf.push(variable);
+				(buf.indexOf?buf.indexOf(variable):indexOf(buf,variable))===-1 && buf.push(variable);
 			};
 
 			tpl.replace(juicer.settings.forstart,memo).

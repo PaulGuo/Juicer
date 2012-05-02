@@ -143,7 +143,7 @@
 			};
 			var memo=function($,variable) {
 				variable=variable.match(/\w+/igm)[0];
-				buf.indexOf?buf.indexOf(variable):indexOf(buf,variable)===-1 && buf.push(variable);//fuck ie
+				(buf.indexOf?buf.indexOf(variable):indexOf(buf,variable))===-1 && buf.push(variable);//fuck ie
 			};
 
 			tpl.replace(juicer.settings.forstart,memo).
