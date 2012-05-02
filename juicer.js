@@ -135,9 +135,15 @@
 		this.__lexical=function(tpl) {
 			var buf=[];
 			var pre='';
+			var indexOf=function(arr,value) {
+				for(var i=0;i<arr.length;i++) {
+					if(arr[i]==value) return i;
+				}
+				return -1;
+			};
 			var memo=function($,variable) {
 				variable=variable.match(/\w+/igm)[0];
-				buf.indexOf(variable)===-1 && buf.push(variable);
+				buf.indexOf?buf.indexOf(variable):indexOf(buf,variable)===-1 && buf.push(variable);//fuck ie
 			};
 
 			tpl.replace(juicer.settings.forstart,memo).
