@@ -87,7 +87,7 @@
 				.replace(juicer.settings.forstart,function($,varname,alias,key) {
 					var alias=alias||'value',key=key && key.substr(1);
 					var iterate_var='i'+iterate_count++;
-					return '<% for(var '+iterate_var+'=0,l='+varname+'.length;'+iterate_var+'<l;'+iterate_var+'++) {'+
+					return '<% for(var '+iterate_var+'=0,l'+iterate_var+'='+varname+'.length;'+iterate_var+'<l'+iterate_var+';'+iterate_var+'++) {'+
 								'var '+alias+'='+varname+'['+iterate_var+'];'+
 								(key?('var '+key+'='+iterate_var+';'):'')+
 							' %>';
@@ -135,9 +135,15 @@
 		this.__lexical=function(tpl) {
 			var buf=[];
 			var pre='';
+			var indexOf=function(arr,value) {
+				for(var i=0;i<arr.length;i++) {
+					if(arr[i]==value) return i;
+				}
+				return -1;
+			};
 			var memo=function($,variable) {
 				variable=variable.match(/\w+/igm)[0];
-				buf.indexOf(variable)===-1 && buf.push(variable);
+				(buf.indexOf?buf.indexOf(variable):indexOf(buf,variable))===-1 && buf.push(variable);//fuck ie
 			};
 
 			tpl.replace(juicer.settings.forstart,memo).
