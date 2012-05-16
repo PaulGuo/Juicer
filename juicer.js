@@ -41,6 +41,7 @@
 		ifstart:/{@if\s*([^}]*?)}/igm,
 		ifend:/{@\/if}/igm,
 		elsestart:/{@else}/igm,
+		elseifstart:/{@else if\s*([^}]*?)}/igm,
 		interpolate:/\${([\s\S]+?)}/igm,
 		noneencode:/\$\${([\s\S]+?)}/igm,
 		inlinecomment:/{#[^}]*?}/igm,
@@ -101,6 +102,10 @@
 				//else expression
 				.replace(juicer.settings.elsestart,function($) {
 					return '<% } else { %>';
+				})
+				//else if expression
+				.replace(juicer.settings.elseifstart,function($,condition) {
+					return '<% } else if('+condition+') { %>';
 				})
 				//interpolate without escape
 				.replace(juicer.settings.noneencode,function($,varname) {
