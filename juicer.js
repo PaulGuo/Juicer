@@ -291,7 +291,7 @@
     };
 
     juicer.to_html = function(tpl, data, options) {
-        return this.compile(tpl,options).render(data, options);
+        return this.compile(tpl, options).render(data, options);
     };
 
     typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
