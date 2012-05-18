@@ -27,7 +27,7 @@
 		};
 		var tpl=[
 			'<ul>',
-				'{@each list as it,k}',
+				'{@each list as it, k}',
 					'<li>${it.name} (index: ${k})</li>',
 				'{@/each}',
 				'{# first level attribute must specify the "data." prefix}',
@@ -42,12 +42,36 @@
 					'</li>',
 				'{@/each}',
 			'</ul>'
-		].join('');
+		].join('\n');
 		var inc=function(n) {
 			return n+1;
 		};
 		var starttimestamp=new Date().getTime();
-		juicer.set('cache',true);
+		var _o={
+			__escapehtml: {
+				__escapehash: {
+					'<': '&lt;',
+					'>': '&gt;',
+					'"': '&quot;',
+					'&': '&amp;'
+				},
+				__escapereplace: function(k) {
+					return __escapehtml.__escapehash[k];
+				},
+				__escape: function(str) {
+					return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, __escapehtml.__escapereplace);
+				},
+				__detection: function(data) {
+					return typeof(data) === 'undefined' ? '' : data;
+				}
+			},
+			cache: true
+		};
+		//juicer.set('cache',true);
+		juicer.set('cache',false);
+		juicer.set('errorhandling',false);
+		juicer.set('strip',true);
+		juicer.set('detection',false);
 		for(var i=0;i<1000;i++) {
 			juicer(tpl,data);
 		}
@@ -55,6 +79,8 @@
 		var exhausttime=endtimestamp-starttimestamp;
 		document.write(juicer(tpl,data));
 		document.write('run time: '+exhausttime);
+		console.log(juicer(tpl).render.toString());
+		console.log(exhausttime);
 	</script>
 </body>
 </html>
