@@ -53,7 +53,7 @@
 	juicer.version = '0.4.0-dev';
 
 	juicer.settings = {
-		forstart:		/{@each\s*([\w\.]*?)\s*as\s*(\w*?)(,\w*?)?}/igm,
+		forstart:		/{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
 		forend:			/{@\/each}/igm,
 		ifstart:		/{@if\s*([^}]*?)}/igm,
 		ifend:			/{@\/if}/igm,
