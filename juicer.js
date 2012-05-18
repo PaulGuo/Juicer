@@ -1,9 +1,13 @@
 /*
-    @author: guokai
-    @email/gtalk: badkaikai@gmail.com
-    @blog/website: http://benben.cc
-    @license: apache license, version 2.0
-    @version: 0.4.0-dev
+    ********** Juicer **********
+    ${A Fast template engine}
+    Project Home: http://juicer.name
+
+    Author: Guokai
+    Gtalk: badkaikai@gmail.com
+    Blog: http://benben.cc
+    Licence: MIT License
+    Version: 0.4.0-dev
 */
 
 (function() {
