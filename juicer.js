@@ -41,9 +41,16 @@
 	};
 	
 	var __throw = function(error) {
-		if(console && console.warn) {
-			console.warn(error);
-			return this;
+		if(console) {
+			if(console.warn) {
+				console.warn(error);
+			}
+
+			if(console.log) {
+				console.log(error);
+			}
+
+			return;
 		}
 		
 		throw(error);
