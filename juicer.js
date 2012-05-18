@@ -220,15 +220,15 @@
 
 			if(strip !== false) {
 				buffer += tpl
-						.replace(/\\/g, "\\\\")
-						.replace(/[\r\t\n]/g, " ")
-						.replace(/'(?=[^%]*%>)/g, "\t")
-						.split("'").join("\\'")
-						.split("\t").join("'")
-						.replace(/<%=(.+?)%>/g, "';out+=$1;out+='")
-						.split("<%").join("';")
-						.split("%>").join("out+='")+
-						"';return out;";
+					.replace(/\\/g, "\\\\")
+					.replace(/[\r\t\n]/g, " ")
+					.replace(/'(?=[^%]*%>)/g, "\t")
+					.split("'").join("\\'")
+					.split("\t").join("'")
+					.replace(/<%=(.+?)%>/g, "';out+=$1;out+='")
+					.split("<%").join("';")
+					.split("%>").join("out+='")+
+					"';return out;";
 
 				return buffer;
 			}
