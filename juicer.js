@@ -215,6 +215,7 @@
         
         this.__convert=function(tpl, strip) {
             var buffer = [].join('');
+            buffer += "'use strict';"; //use strict mode
             buffer += "var _ = _ || {};";
             buffer += "var out = '';out += '";
 
@@ -254,7 +255,6 @@
             
             tpl = this.__removeShell(tpl, options);
             tpl = this.__toNative(tpl, options);
-            tpl = '"use strict";' + tpl; //use strict mode
 
             this.render = new Function('_, _method', tpl);
             return this;
