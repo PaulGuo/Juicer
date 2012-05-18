@@ -267,9 +267,7 @@
 			__throw('Juicer Compile Exception: ' + e.message);
 			
 			return {
-				render: function() {
-					//noop
-				}
+				render: function() {} //noop
 			};
 		}
 	};
