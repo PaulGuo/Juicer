@@ -184,6 +184,7 @@
         this.__lexicalAnalyze = function(tpl) {
             var buffer = [];
             var prefix = '';
+
             var indexOf = function(array, item) {
                 if (Array.prototype.indexOf && array.indexOf === Array.prototype.indexOf) {
                     return array.indexOf(item);
@@ -195,6 +196,7 @@
                 
                 return -1;
             };
+
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
                 
@@ -215,6 +217,7 @@
         
         this.__convert=function(tpl, strip) {
             var buffer = [].join('');
+
             buffer += "'use strict';"; //use strict mode
             buffer += "var _=_||{};";
             buffer += "var _out='';_out+='";
