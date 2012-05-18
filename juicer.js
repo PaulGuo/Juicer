@@ -216,8 +216,8 @@
         this.__convert=function(tpl, strip) {
             var buffer = [].join('');
             buffer += "'use strict';"; //use strict mode
-            buffer += "var _ = _ || {};";
-            buffer += "var out = '';out += '";
+            buffer += "var _=_||{};";
+            buffer += "var _out='';_out+='";
 
             if(strip !== false) {
                 buffer += tpl
@@ -226,10 +226,10 @@
                     .replace(/'(?=[^%]*%>)/g, "\t")
                     .split("'").join("\\'")
                     .split("\t").join("'")
-                    .replace(/<%=(.+?)%>/g, "';out+=$1;out+='")
+                    .replace(/<%=(.+?)%>/g, "';_out+=$1;_out+='")
                     .split("<%").join("';")
-                    .split("%>").join("out+='")+
-                    "';return out;";
+                    .split("%>").join("_out+='")+
+                    "';return _out;";
 
                 return buffer;
             }
@@ -242,10 +242,10 @@
                     .replace(/'(?=[^%]*%>)/g, "\t")
                     .split("'").join("\\'")
                     .split("\t").join("'")
-                    .replace(/<%=(.+?)%>/g, "';out+=$1;out+='")
+                    .replace(/<%=(.+?)%>/g, "';_out+=$1;_out+='")
                     .split("<%").join("';")
-                    .split("%>").join("out+='")+
-                    "';return out.replace(/[\\r\\n]\\t+[\\r\\n]/g, '\\r\\n');";
+                    .split("%>").join("_out+='")+
+                    "';return _out.replace(/[\\r\\n]\\t+[\\r\\n]/g, '\\r\\n');";
                     
             return buffer;
         };
