@@ -48,13 +48,13 @@
         if(console) {
             if(console.warn) {
                 console.warn(error);
+                return;
             }
 
             if(console.log) {
                 console.log(error);
+                return;
             }
-
-            return;
         }
         
         throw(error);
