@@ -251,7 +251,9 @@
         };
 
         this.parse = function(tpl, options) {
-            if(!options || options.loose !== false) tpl = this.__lexicalAnalyze(tpl) + tpl;
+            if(!options || options.loose !== false) {
+                tpl = this.__lexicalAnalyze(tpl) + tpl;
+            }
             
             tpl = this.__removeShell(tpl, options);
             tpl = this.__toNative(tpl, options);
@@ -263,7 +265,9 @@
 
     juicer.compile = function(tpl, options) {
         try {
-            var engine = this.__cache[tpl] ? this.__cache[tpl] : new this.template().parse(tpl, options);
+            var engine = this.__cache[tpl] ? 
+                this.__cache[tpl] : 
+                new this.template().parse(tpl, options);
             
             if(!options || options.cache !== false) {
                 this.__cache[tpl] = engine;
