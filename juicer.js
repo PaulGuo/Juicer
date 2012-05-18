@@ -248,7 +248,7 @@
                     .replace(/<%=(.+?)%>/g, "';_out+=$1;_out+='")
                     .split("<%").join("';")
                     .split("%>").join("_out+='")+
-                    "';return _out.replace(/[\\r\\n]\\t+[\\r\\n]/g, '\\r\\n');";
+                    "';return _out.replace(/[\\r\\n]\\s+[\\r\\n]/g, '\\r\\n');";
                     
             return buffer;
         };
