@@ -80,6 +80,7 @@
         cache: true,
         strip: true,
         errorhandling: true,
+        detection: true,
         __escapehtml: __escapehtml,
         __throw: __throw
     };
