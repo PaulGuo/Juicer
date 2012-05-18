@@ -14,12 +14,14 @@
 		if(arguments.length >= 2) return juicer.to_html.apply(juicer, args);
 	};
 
-	this.__escapehtml = {
+	var __escapehtml = {
 		__escapehash: {
 			'<': '&lt;',
 			'>': '&gt;',
+			'&': '&amp;',
 			'"': '&quot;',
-			'&': '&amp;'
+			"'": '&#x27;',
+			'/': '&#x2f;'
 		},
 		__escapereplace: function(k) {
 			return __escapehtml.__escapehash[k];
@@ -51,7 +53,8 @@
 	juicer.options = {
 		cache: true,
 		strip: true,
-		errorhandling: true
+		errorhandling: true,
+		__escapehtml: __escapehtml
 	};
 
 	juicer.set = function(conf, value) {
@@ -65,12 +68,12 @@
 			var __define = varname.split('|'), fn = '';
 			if(__define.length > 1) {
 				varname = __define.shift();
-				fn = __define.shift();
+				fn = '__method.' + __define.shift();
 			}
 			return '<%= ' +
-						(escape ? '__escapehtml.__escape' : '') +
+						(escape ? '__method.__escapehtml.__escape' : '') +
 							'(' +
-								(!options || options.detection !== false ? '__escapehtml.__detection' : '') +
+								(!options || options.detection !== false ? '__method.__escapehtml.__detection' : '') +
 									'(' +
 										fn +
 											'(' +
@@ -163,7 +166,7 @@
 
 		this.__convert=function(tpl, strip) {
 			var buf = [].join('');
-			buf += "var data = data||{};";
+			buf += "var __data = __data||{};";
 			buf += "var out = '';out += '";
 			if(strip !== false) {
 				buf += tpl
@@ -199,7 +202,7 @@
 			tpl = this.__pure(tpl, options);
 			tpl = '"use strict";' + tpl; //use strict mode
 
-			this.render = new Function('data', tpl);
+			this.render = new Function('__data, __method', tpl);
 			return this;
 		};
 	};
@@ -216,7 +219,7 @@
 	};
 
 	juicer.to_html = function(tpl, data, options) {
-		return this.compile(tpl,options).render(data);
+		return this.compile(tpl,options).render(data, options);
 	};
 
 	typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
