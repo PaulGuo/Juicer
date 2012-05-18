@@ -21,7 +21,7 @@
 	};
 
 	var __escapehtml = {
-		__escapehash: {
+		escapehash: {
 			'<': '&lt;',
 			'>': '&gt;',
 			'&': '&amp;',
@@ -29,13 +29,13 @@
 			"'": '&#x27;',
 			'/': '&#x2f;'
 		},
-		__escapereplace: function(k) {
-			return __escapehtml.__escapehash[k];
+		escapereplace: function(k) {
+			return this.escapehash[k];
 		},
-		__escape: function(str) {
-			return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, __escapehtml.__escapereplace);
+		escaping: function(str) {
+			return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, this.escapereplace);
 		},
-		__detection: function(data) {
+		detection: function(data) {
 			return typeof(data) === 'undefined' ? '' : data;
 		}
 	};
@@ -91,20 +91,22 @@
 	juicer.template = function() {
 		var that = this;
 
-		this.__interpolate = function(varname, escape, options) {
-			var __define = varname.split('|'), fn = '';
-			if(__define.length > 1) {
-				varname = __define.shift();
-				fn = '_method.' + __define.shift();
+		this.__interpolate = function(_name, _escape, options) {
+			var _define = _name.split('|'), _fn = '';
+
+			if(_define.length > 1) {
+				_name = _define.shift();
+				_fn = '_method.' + _define.shift();
 			}
+
 			return '<%= ' +
-						(escape ? '_method.__escapehtml.__escape' : '') +
+						(_escape ? '_method.__escapehtml.escaping' : '') +
 							'(' +
-								(!options || options.detection !== false ? '_method.__escapehtml.__detection' : '') +
+								(!options || options.detection !== false ? '_method.__escapehtml.detection' : '') +
 									'(' +
-										fn +
+										_fn +
 											'(' +
-												varname +
+												_name +
 											')' +
 									')' +
 							')' +
