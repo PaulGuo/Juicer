@@ -125,29 +125,36 @@
 							' %>';
 				})
 				.replace(juicer.settings.forend, '<% } %>')
+
 				//if expression
 				.replace(juicer.settings.ifstart, function($, condition) {
 					return '<% if(' + condition + ') { %>';
 				})
 				.replace(juicer.settings.ifend, '<% } %>')
+
 				//else expression
 				.replace(juicer.settings.elsestart, function($) {
 					return '<% } else { %>';
 				})
+
 				//else if expression
 				.replace(juicer.settings.elseifstart, function($, condition) {
 					return '<% } else if(' + condition + ') { %>';
 				})
+
 				//interpolate without escape
 				.replace(juicer.settings.noneencode, function($, _name) {
 					return that.__interpolate(_name, false, options);
 				})
+
 				//interpolate with escape
 				.replace(juicer.settings.interpolate, function($, _name) {
 					return that.__interpolate(_name, true, options);
 				})
+
 				//clean up comments
 				.replace(juicer.settings.inlinecomment, '')
+
 				//range expression
 				.replace(juicer.settings.rangestart, function($, _name, start, end) {
 					var _iterate = 'j' + _counter++;
@@ -200,39 +207,39 @@
 			}
 			return '<% ' + prefix + ' %>';
 		};
-
-		/*
-			<% if(true) { %>
-				<ul>
-					<%= <li> juicer </li> %>
-					<%= <li> juicer </li> %>
-				</ul>
-			<% } %>
-			
-			var out = '';
-			out += '';
-			if(true) {
-				out += '<ul>';
-				out += '<li> juicer </li>';
-				out += '<li> juicer </li>';
-				out += '</ul>';
-			}
-		*/
 		
 		this.__convert=function(tpl, strip) {
 			var buffer = [].join('');
 			buffer += "var _ = _ || {};";
 			buffer += "var out = '';out += '";
+
+			if(strip !== false) {
+				buffer += tpl
+						.replace(/\\/g, "\\\\")
+						.replace(/[\r\t\n]/g, " ")
+						.replace(/'(?=[^%]*%>)/g, "\t")
+						.split("'").join("\\'")
+						.split("\t").join("'")
+						.replace(/<%=(.+?)%>/g, "';out+=$1;out+='")
+						.split("<%").join("';")
+						.split("%>").join("out+='")+
+						"';return out;";
+
+				return buffer;
+			}
+
 			buffer += tpl
 					.replace(/\\/g, "\\\\")
-					.replace(/[\r\t\n]/g, " ")
+					.replace(/[\r]/g, "\\r")
+					.replace(/[\t]/g, "\\t")
+					.replace(/[\n]/g, "\\n")
 					.replace(/'(?=[^%]*%>)/g, "\t")
 					.split("'").join("\\'")
 					.split("\t").join("'")
-					.replace(/<%=(.+?)%>/g,"';out += $1;out += '")
+					.replace(/<%=(.+?)%>/g, "';out+=$1;out+='")
 					.split("<%").join("';")
-					.split("%>").join("out += '")+
-					"';return out;";
+					.split("%>").join("out+='")+
+					"';return out.replace(/[\\r\\n]\\t+[\\r\\n]/g, '\\r\\n');";
 					
 			return buffer;
 		};
