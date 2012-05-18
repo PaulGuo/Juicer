@@ -99,18 +99,14 @@
 				_fn = '_method.' + _define.shift();
 			}
 
-			return '<%= ' +
-						(_escape ? '_method.__escapehtml.escaping' : '') +
-							'(' +
-								(!options || options.detection !== false ? '_method.__escapehtml.detection' : '') +
-									'(' +
-										_fn +
-											'(' +
-												_name +
-											')' +
-									')' +
-							')' +
-					' %>';
+			return '<%= ' + (_escape ? '_method.__escapehtml.escaping' : '') + '(' +
+							(!options || options.detection !== false ? '_method.__escapehtml.detection' : '') + '(' +
+									_fn + '(' +
+											_name +
+										')' +
+								')' +
+						')' +
+				' %>';
 		};
 
 		this.__removeShell = function(tpl, options) {
@@ -124,7 +120,7 @@
 					return '<% for(var ' + _iterate + '=0, l' + _iterate + '=' + _name + '.length;' + _iterate + '<l' + _iterate + ';' + _iterate + '++) {' +
 								'var ' + alias + '=' + _name + '[' + _iterate + '];' +
 								(key ? ('var ' + key + '=' + _iterate + ';') : '') +
-							' %>';
+						' %>';
 				})
 				.replace(juicer.settings.forend, '<% } %>')
 
@@ -162,7 +158,7 @@
 					var _iterate = 'j' + _counter++;
 					return '<% for(var ' + _iterate + '=0;' + _iterate + '<' + (end - start) + ';' + _iterate + '++) {' +
 								'var ' + _name + '=' + _iterate + ';' +
-							' %>';
+						' %>';
 				});
 
 			//exception handling
