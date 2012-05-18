@@ -60,16 +60,16 @@
 	juicer.version = '0.4.0-dev';
 
 	juicer.settings = {
-		forstart:		/{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
-		forend:			/{@\/each}/igm,
-		ifstart:		/{@if\s*([^}]*?)}/igm,
-		ifend:			/{@\/if}/igm,
-		elsestart:		/{@else}/igm,
-		elseifstart:	/{@else if\s*([^}]*?)}/igm,
-		interpolate:	/\${([\s\S]+?)}/igm,
-		noneencode:		/\$\${([\s\S]+?)}/igm,
-		inlinecomment:  /{#[^}]*?}/igm,
-		rangestart:		/{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
+		forstart:      /{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
+		forend:        /{@\/each}/igm,
+		ifstart:       /{@if\s*([^}]*?)}/igm,
+		ifend:         /{@\/if}/igm,
+		elsestart:     /{@else}/igm,
+		elseifstart:   /{@else if\s*([^}]*?)}/igm,
+		interpolate:   /\${([\s\S]+?)}/igm,
+		noneencode:    /\$\${([\s\S]+?)}/igm,
+		inlinecomment: /{#[^}]*?}/igm,
+		rangestart:    /{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
 	};
 
 	juicer.options = {
