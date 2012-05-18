@@ -67,7 +67,7 @@
 				varname = __define.shift();
 				fn = __define.shift();
 			}
-			return '<%= '+
+			return '<%= ' +
 						(escape ? '__escapehtml.__escape' : '') +
 							'(' +
 								(!options || options.detection !== false ? '__escapehtml.__detection' : '') +
