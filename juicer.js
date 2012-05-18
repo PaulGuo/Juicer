@@ -68,7 +68,7 @@
 				fn = __define.shift();
 			}
 			return '<%= '+
-						(escape?'__escapehtml.__escape':'') +
+						(escape ? '__escapehtml.__escape' : '') +
 							'(' +
 								(!options || options.detection !== false ? '__escapehtml.__detection' : '') +
 									'(' +
