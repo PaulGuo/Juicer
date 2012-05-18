@@ -43,14 +43,13 @@
 	var __throw = function(error) {
 		if(console && console.warn) {
 			console.warn(error);
-			return;
+			return this;
 		}
 		
 		throw(error);
 	};
 
 	juicer.__cache = {};
-	
 	juicer.version = '0.4.0-dev';
 
 	juicer.settings = {
@@ -64,13 +63,6 @@
 		noneencode:		/\$\${([\s\S]+?)}/igm,
 		inlinecomment:  /{#[^}]*?}/igm,
 		rangestart:		/{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
-	};
-	
-	juicer.helper = {};
-	
-	juicer.register = function(helper, body) {
-		if(this.helper[helper]) return;
-		this.helper[helper] = body;
 	};
 
 	juicer.options = {
@@ -122,45 +114,47 @@
 		this.__removeShell = function(tpl, options) {
 			var _counter = 0;
 			
-	juicer.register('forstart', function($, _name, alias, key) {
-		var alias = alias || 'value', key = key && key.substr(1);
-		var _iterate = 'i' + _counter++;
-		return '<% for(var ' + _iterate + '=0, l' + _iterate + '=' + _name + '.length;' + _iterate + '<l' + _iterate + ';' + _iterate + '++) {' +
-					'var ' + alias + '=' + _name + '[' + _iterate + '];' +
-					(key?('var ' + key + '=' + _iterate + ';'):'') +
-				' %>';
-	});
-	
-	juicer.register('forend', '<% } %>');
-	juicer.register('ifstart', function($, condition) {
-		return '<% if(' + condition + ') { %>';
-	});
-	juicer.register('ifend' ,'<% } %>');
-	juicer.register('elsestart', function($) {
-		return '<% } else { %>';
-	});
-	juicer.register('elseifstart', function($, condition) {
-		return '<% } else if(' + condition + ') { %>';
-	});
-	juicer.register('noneencode', function($, _name) {
-		return that.__interpolate(_name, false, options);
-	});
-	juicer.register('interpolate', function($, _name) {
-		return that.__interpolate(_name, true, options);
-	});
-	juicer.register('inlinecomment', '');
-	juicer.register('rangestart', function($, _name, start, end) {
-		var _iterate = 'j' + _counter++;
-		return '<% for(var ' + _iterate + '=0;' + _iterate + '<' + (end - start) + ';' + _iterate + '++) {' +
-					'var ' + _name + '=' + _iterate + ';' +
-				' %>';
-	});
-			
-			for(var helper in juicer.helper) {
-				if(juicer.helper.hasOwnProperty(helper)) {
-					tpl = tpl.replace(juicer.settings[helper], juicer.helper[helper]);
-				}
-			}
+			tpl = tpl
+				//for expression
+				.replace(juicer.settings.forstart, function($, _name, alias, key) {
+					var alias = alias || 'value', key = key && key.substr(1);
+					var _iterate = 'i' + _counter++;
+					return '<% for(var ' + _iterate + '=0, l' + _iterate + '=' + _name + '.length;' + _iterate + '<l' + _iterate + ';' + _iterate + '++) {' +
+								'var ' + alias + '=' + _name + '[' + _iterate + '];' +
+								(key ? ('var ' + key + '=' + _iterate + ';') : '') +
+							' %>';
+				})
+				.replace(juicer.settings.forend, '<% } %>')
+				//if expression
+				.replace(juicer.settings.ifstart, function($, condition) {
+					return '<% if(' + condition + ') { %>';
+				})
+				.replace(juicer.settings.ifend, '<% } %>')
+				//else expression
+				.replace(juicer.settings.elsestart, function($) {
+					return '<% } else { %>';
+				})
+				//else if expression
+				.replace(juicer.settings.elseifstart, function($, condition) {
+					return '<% } else if(' + condition + ') { %>';
+				})
+				//interpolate without escape
+				.replace(juicer.settings.noneencode, function($, _name) {
+					return that.__interpolate(_name, false, options);
+				})
+				//interpolate with escape
+				.replace(juicer.settings.interpolate, function($, _name) {
+					return that.__interpolate(_name, true, options);
+				})
+				//clean up comments
+				.replace(juicer.settings.inlinecomment, '')
+				//range expression
+				.replace(juicer.settings.rangestart, function($, _name, start, end) {
+					var _iterate = 'j' + _counter++;
+					return '<% for(var ' + _iterate + '=0;' + _iterate + '<' + (end - start) + ';' + _iterate + '++) {' +
+								'var ' + _name + '=' + _iterate + ';' +
+							' %>';
+				});
 
 			//exception handling
 			if(!options || options.errorhandling !== false) {
