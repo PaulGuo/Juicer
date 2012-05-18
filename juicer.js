@@ -141,35 +141,43 @@
 		};
 
 		this.__lexical = function(tpl) {
-			var buf = [];
-			var pre = '';
-			var indexOf = function(arr, value) {
-				for(var i=0; i < arr.length; i++) {
-					if(arr[i] == value) return i;
+			var buffer = [];
+			var prefix = '';
+			var indexOf = function(array, item) {
+				if (Array.prototype.indexOf && array.indexOf === Array.prototype.indexOf) {
+					return array.indexOf(item);
 				}
+				
+				for(var i=0; i < array.length; i++) {
+					if(array[i] === item) return i;
+				}
+				
 				return -1;
 			};
 			var memo = function($, variable) {
 				variable = variable.match(/\w+/igm)[0];
-				(buf.indexOf ? buf.indexOf(variable) : indexOf(buf,variable)) === -1 && buf.push(variable); //fuck ie
+				
+				if(indexOf(buffer,variable) === -1) {
+					buffer.push(variable); //fuck ie
+				}
 			};
 
 			tpl.replace(juicer.settings.forstart, memo).
 				replace(juicer.settings.interpolate, memo).
 				replace(juicer.settings.ifstart, memo);
 
-			for(var i = 0;i < buf.length; i++) {
-				pre += 'var ' + buf[i] + '=data.' + buf[i] + ';';
+			for(var i = 0;i < buffer.length; i++) {
+				prefix += 'var ' + buffer[i] + '=__data.' + buffer[i] + ';';
 			}
-			return '<% ' + pre + ' %>';
+			return '<% ' + prefix + ' %>';
 		};
 
 		this.__convert=function(tpl, strip) {
-			var buf = [].join('');
-			buf += "var __data = __data||{};";
-			buf += "var out = '';out += '";
+			var buffer = [].join('');
+			buffer += "var __data = __data||{};";
+			buffer += "var out = '';out += '";
 			if(strip !== false) {
-				buf += tpl
+				buffer += tpl
 						.replace(/\\/g, "\\\\")
 						.replace(/[\r\t\n]/g, " ")
 						.replace(/'(?=[^%]*%>)/g, "\t")
@@ -180,7 +188,7 @@
 						.split("%>").join("out += '")+
 						"';return out;";
 			} else {
-				buf += tpl
+				buffer += tpl
 						.replace(/\\/g, "\\\\")
 						.replace(/[\r]/g, "\\r")
 						.replace(/[\t]/g, "\\t")
@@ -193,7 +201,7 @@
 						.split("%>").join("out += '")+
 						"';return out.replace(/[\\r\\n]\\t+[\\r\\n]/g, '\\r\\n');";
 			}
-			return buf;
+			return buffer;
 		};
 
 		this.parse = function(tpl, options) {
