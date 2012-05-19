@@ -120,8 +120,10 @@
         }
     };
 
-    juicer.template = function() {
+    juicer.template = function(options) {
         var that = this;
+
+        this.options = options;
 
         this.__interpolate = function(_name, _escape, options) {
             var _define = _name.split('|'), _fn = '';
@@ -279,6 +281,8 @@
         };
 
         this.parse = function(tpl, options) {
+            var _that = this;
+
             if(!options || options.loose !== false) {
                 tpl = this.__lexicalAnalyze(tpl) + tpl;
             }
@@ -286,7 +290,16 @@
             tpl = this.__removeShell(tpl, options);
             tpl = this.__toNative(tpl, options);
 
-            this.render = new Function('_, _method', tpl);
+            this._render = new Function('_, _method', tpl);
+
+            this.render = function(_, _method) {
+                if(!_method || _method !== that.options) {
+                    _method = __creator(_method, that.options);
+                }
+
+                return _that._render.call(this, _, _method);
+            };
+
             return this;
         };
     };
@@ -299,7 +312,7 @@
         try {
             var engine = this.__cache[tpl] ? 
                 this.__cache[tpl] : 
-                new this.template().parse(tpl, options);
+                new this.template(this.options).parse(tpl, options);
             
             if(!options || options.cache !== false) {
                 this.__cache[tpl] = engine;
