@@ -61,7 +61,7 @@
     };
 
     var __creator = function(o, proto) {
-        o = typeof(o) === 'undefined' ? {} : o;
+        o = o !== Object(o) ? {} : o;
 
         if(o.__proto__) {
             o.__proto__ = proto;
