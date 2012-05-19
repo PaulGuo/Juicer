@@ -34,7 +34,7 @@ YUI.add('juicer',function(Y) {
             '/': '&#x2f;'
         },
         escapereplace: function(k) {
-            return this.escapehash[k];
+            return __escapehtml.escapehash[k];
         },
         escaping: function(str) {
             return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, this.escapereplace);
@@ -101,8 +101,10 @@ YUI.add('juicer',function(Y) {
         strip: true,
         errorhandling: true,
         detection: true,
-        __escapehtml: __escapehtml,
-        __throw: __throw
+        _method: {
+            __escapehtml: __escapehtml,
+            __throw: __throw
+        }
     };
 
     juicer.set = function(conf, value) {
@@ -120,8 +122,28 @@ YUI.add('juicer',function(Y) {
         }
     };
 
-    juicer.template = function() {
+    juicer.register = function(fname, fn) {
+        var _method = this.options._method;
+
+        if(_method.hasOwnProperty(fname)) {
+            return false;
+        }
+
+        return _method[fname] = fn;
+    };
+
+    juicer.unregister = function(fname) {
+        var _method = this.options._method;
+
+        if(_method.hasOwnProperty(fname)) {
+            return delete _method[fname];
+        }
+    };
+
+    juicer.template = function(options) {
         var that = this;
+
+        this.options = options;
 
         this.__interpolate = function(_name, _escape, options) {
             var _define = _name.split('|'), _fn = '';
@@ -195,8 +217,8 @@ YUI.add('juicer',function(Y) {
 
             //exception handling
             if(!options || options.errorhandling !== false) {
-                tpl += '<% try { %>' + tpl;
-                tpl += '<% } catch(e) {__throw("Juicer Render Exception: "+e.message);} %>';
+                tpl = '<% try { %>' + tpl;
+                tpl += '<% } catch(e) {_method.__throw("Juicer Render Exception: "+e.message);} %>';
             }
 
             return tpl;
@@ -279,6 +301,8 @@ YUI.add('juicer',function(Y) {
         };
 
         this.parse = function(tpl, options) {
+            var _that = this;
+
             if(!options || options.loose !== false) {
                 tpl = this.__lexicalAnalyze(tpl) + tpl;
             }
@@ -286,7 +310,16 @@ YUI.add('juicer',function(Y) {
             tpl = this.__removeShell(tpl, options);
             tpl = this.__toNative(tpl, options);
 
-            this.render = new Function('_, _method', tpl);
+            this._render = new Function('_, _method', tpl);
+
+            this.render = function(_, _method) {
+                if(!_method || _method !== that.options._method) {
+                    _method = __creator(_method, that.options._method);
+                }
+
+                return _that._render.call(this, _, _method);
+            };
+
             return this;
         };
     };
@@ -299,7 +332,7 @@ YUI.add('juicer',function(Y) {
         try {
             var engine = this.__cache[tpl] ? 
                 this.__cache[tpl] : 
-                new this.template().parse(tpl, options);
+                new this.template(this.options).parse(tpl, options);
             
             if(!options || options.cache !== false) {
                 this.__cache[tpl] = engine;
@@ -321,7 +354,7 @@ YUI.add('juicer',function(Y) {
             options = __creator(options, this.options);
         }
 
-        return this.compile(tpl, options).render(data, options);
+        return this.compile(tpl, options).render(data, options._method);
     };
 
     Y.juicer=juicer;
