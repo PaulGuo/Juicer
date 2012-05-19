@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Juicer 中文文档</title>
+	<link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+<h2>Juicer 中文文档</h2>
+
+<p><strong>当前最新版本: 0.4.0-dev</strong></p>
+
+<p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
+除此之外，它还可以在 Node.js 环境中运行。</p>
+
+<p>你可以在遵守 MIT Licence 的前提下随意使用并分发它。Juicer 代码完全开源并托管在 
+<a href="https://github.com/PaulGuo/Juicer">Github</a> 上，如果你在使用的过程中发现
+什么 Bug 抑或是一些好的建议都欢迎在 <a href="https://github.com/PaulGuo/Juicer/issues">Github Issue</a>
+上提交。</p>
+
+<h4>名字的由来</h4>
+
+<p>倘若我们把数据比作新鲜可口的水果，把模板看做是水，Juicer 就是把水果和水榨出我们需要的HTML代码片段的榨汁机。</p>
+
+<h4>Juicer 的引入</h4>
+
+<pre><code>&lt;script type="text/javascript" src="juicer-min.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<h2>* 使用方法</h2>
+
+<p>&gt; 编译模板并根据所给的数据立即渲染出结果.</p>
+
+<pre><code>juicer(tpl, data);
+</code></pre>
+
+<p>&gt; 仅编译模版暂不渲染，它会返回一个可重用的编译后的函数.</p>
+
+<pre><code>var compiled_tpl = juicer(tpl);
+</code></pre>
+
+<p>&gt; 根据给定的数据，对之前编译好的模板进行数据渲染.</p>
+
+<pre><code>var compiled_tpl = juicer(tpl);
+var html = compiled_tpl.render(data);
+</code></pre>
+
+<h4>默认参数配置</h4>
+
+<pre><code>{
+    cache:          true [false],
+    strip:          true [false],
+    errorhandling:  true [false],
+    detection:      true [false]
+}
+</code></pre>
+
+<p>默认配置是 Juicer 推荐的使用方式，如果你使用过程中的确需要更改这些参数，可以这么做：</p>
+
+<h5>逐条参数更改：</h5>
+
+<pre><code>juicer.set('strip',false);
+juicer.set('cache',false);
+</code></pre>
+
+<h5>批量参数更改：</h5>
+
+<pre><code>juicer.set({
+    'strip': false,
+    'cache': false
+};
+</code></pre>
+
+<p>Juicer 默认会对编译后的模板进行缓存，从而避免同一模板多次数据渲染时候重复编译所耗的时间，
+如无特殊需要，强烈不建议关闭默认参数中的 cache，这么做将会令 Juicer 缓存失效从而降低性能.</p>
+
+<h2>* 语法</h2>
+
+<h4>a. ${变量}</h4>
+
+<p>使用 ${} 输出变量值，支持自定义函数（通过自定义函数你可以实现很多有趣的功能，类似 ${data|links} 就可以
+通过事先定义的自定义函数 links 直接对 data 拼装出&lt;a href=".." alt=".." /&gt; ）.</p>
+
+<pre><code>${name}
+${name|function}
+</code></pre>
+
+<p>让我们通过一个例子演示一下自定义函数的奇妙用法吧.</p>
+
+<pre><code>var json = {
+    links: [
+        {href: 'http://juicer.name', alt: 'Juicer'},
+        {href: 'http://benben.cc', alt: 'Benben'},
+        {href: 'http://ued.taobao.com', alt: 'Taobao UED'}
+    ]
+};
+
+var tpl = [
+    '{@each links as item}',
+        '${item|links} &lt;br /&gt;',
+    '{@/each}'
+].join('');
+
+var links = function(data) {
+	return '&lt;a href="' + data.href + '" alt="' + data.alt + '"';
+};
+
+juicer(tpl, json);
+</code></pre>
+
+<strong>escape/unescape</strong>
+
+<p>it is noteworthy that, for security reasons, ${output} will do escape to the output, if you do not want it to be escaped, you can use $${output} to avoid this. 
+for example:</p>
+
+<pre><code>var json={
+	value:'&lt;strong&gt;juicer&lt;/strong&gt;'
+};
+
+var escapetpl='${value}';
+var unescapetpl='$${value}';
+
+juicer(escapetpl,json); //it'll be '&amp;lt;strong&amp;gt;juicer&amp;lt;/strong&amp;gt;'
+juicer(unescapetpl,json); //it'll be '&lt;strong&gt;juicer&lt;/strong&gt;'
+</code></pre>
+
+<h4>b. {@each} ... {@/each}</h4>
+
+<p>when you need iterate a list, you can use `each` like this.</p>
+
+<pre><code>{@each list as item}
+	${item.prop}
+{@/each}
+</code></pre>
+
+<p>you can also get the index while eaching.</p>
+
+<pre><code>{@each list as item,index}
+	${item.prop}
+	${index} //index
+{@/each}
+</code></pre>
+
+<h4>c. {@if} ... {@else} ... {@/if}</h4>
+
+<p>you can also use if-else if you need.</p>
+
+<pre><code>{@each list as item,index}
+	{@if index===3}
+		the index is 3, the value is ${item.prop}
+	{@else}
+		the index is not 3, the value is ${item.prop}
+	{@/if}
+{@/each}
+</code></pre>
+
+<h4>d. {# comment}</h4>
+
+<p>you can also write comments in the template code to facilitate future management.</p>
+
+<pre><code>{# some comment here}</code></pre>
+
+<h2>* running on the node.js environment</h2>
+
+<pre><code>bash: npm install juicer
+var juicer=require('juicer');
+var html=juicer(tpl,data);
+</code></pre>
+
+<h2>* demo</h2>
+
+<pre><code>&lt;ul&gt;
+	{@each list as it,index}
+		&lt;li&gt;${it.name} (index: ${index})&lt;/li&gt;
+	{@/each}
+	{@each blah as it}
+		&lt;li&gt;
+			num: ${it.num} &lt;br /&gt;
+			{@if it.num==3}
+				{@each it.inner as it2}
+					${it2.time} &lt;br /&gt;
+				{@/each}
+			{@/if}
+		&lt;/li&gt;
+	{@/each}
+&lt;/ul&gt;
+
+var data={
+	list:[
+		{name:'guokai',show:true},
+		{name:'benben',show:false},
+		{name:'dierbaby',show:true}
+	],
+	blah:[
+		{num:1},
+		{num:2},
+		{num:3,inner:[
+			{'time':'15:00'},
+			{'time':'16:00'},
+			{'time':'17:00'},
+			{'time':'18:00'}
+		]},
+		{num:4}
+	]
+};
+</code></pre>
+
+</body>
+</html>

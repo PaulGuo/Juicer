@@ -1,6 +1,6 @@
 body {
-	background:#46483e;
-	border-top:6px solid #eeaf04;
+	background:#fff;
+	border-top:6px solid #61ad3c;
 	padding-top:70px;
 	font-family:'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Verdana,Tahoma,sans-serif;
 }
@@ -34,7 +34,7 @@ a {
 	width:775px;
 	margin:0 auto;
 	text-align:center;
-	color:#d2d8ba;
+	color:#000;
 	font-family:georgia;
 }
 
@@ -78,13 +78,13 @@ a {
 
 #intro p.version {
 	padding-top:10px;
-	font-size:12px;
+	font-size:13px;
 }
 
 #quotes {
 	text-align:center;
 	width:100%;
-	background-color:#33342d;
+	background-color:#eef;
 	margin-top:40px;
 	padding-top:20px;
 	padding-bottom:20px;
@@ -124,7 +124,7 @@ a {
 }
 
 #quotes .help ul a {
-	color:#eee;
+	color:#000;
 
 	-moz-transition:all 0.2s ease-in;
 	-webkit-transition:all 0.2s ease-in;
@@ -144,7 +144,7 @@ a {
 	padding:0 0 0 50px;
 	font-family:'Droid Sans Mono','Bitstream Vera Sans Mono','DejaVu Sans Mono',Monaco,Courier,monospace,courier new;
 	font-family:Consolas,Inconsolata,'Bitstream Vera Sans Mono',Menlo, Monaco,'Andale Mono','Courier New',monospace;
-	color:#d2d8ba;
+	color:#000;
 	font-size:11px;
 	text-align:left;
 	line-height:20px;
@@ -154,7 +154,7 @@ a {
 	font-weight:bold;
 	padding-left:10px;
 	margin-bottom:5px;
-	color:#eeaf04;
+	color:#61ad3c;
 }
 
 #quotes .codes pre {
@@ -165,7 +165,7 @@ a {
 }
 
 #quotes .codes .render {
-	background:#d2d8ba;
+	background:#dee;
 	color:#46483e;
 	margin:15px 0;
 	padding:3px 10px;

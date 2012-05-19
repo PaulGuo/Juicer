@@ -1,7 +1,8 @@
 body {
 	width:800px;
 	margin:0 auto;
-	font-family:Georgia,'Nimbus Roman No9 L','Liberation Serif',serif;
+	/*font-family:Georgia,'Nimbus Roman No9 L','Liberation Serif',serif;*/
+	font-family:"Lucida Sans", Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
 	line-height:1.4em;
 	background:#fff;
 }
