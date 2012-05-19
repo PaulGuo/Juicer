@@ -218,7 +218,7 @@
             //exception handling
             if(!options || options.errorhandling !== false) {
                 tpl = '<% try { %>' + tpl;
-                tpl += '<% } catch(e) {__throw("Juicer Render Exception: "+e.message);} %>';
+                tpl += '<% } catch(e) {_method.__throw("Juicer Render Exception: "+e.message);} %>';
             }
 
             return tpl;
