@@ -38,10 +38,10 @@ var tpl=[
 	'</ul>'
 ].join('');
 
-http.createServer(function(req,res) {
-	res.writeHead(200,{'Content-Type':'text/html'});
+http.createServer(function(req, res) {
+	res.writeHead(200, {'Content-Type': 'text/html'});
 	res.write('<h2>Hello Juicer</h2>\n');
-	res.write(juicer.to_html(tpl,data));
+	res.write(juicer(tpl, data));
 	res.end();
 }).listen(1012);
 

@@ -25,6 +25,7 @@
 				{num:4}
 			]
 		};
+
 		var tpl=[
 			'<ul>',
 				'{@each list as it, k}',
@@ -43,42 +44,28 @@
 				'{@/each}',
 			'</ul>'
 		].join('\n');
+
 		var inc=function(n) {
 			return n+1;
 		};
+
 		var starttimestamp=new Date().getTime();
-		var _o={
-			__escapehtml: {
-				__escapehash: {
-					'<': '&lt;',
-					'>': '&gt;',
-					'"': '&quot;',
-					'&': '&amp;'
-				},
-				__escapereplace: function(k) {
-					return __escapehtml.__escapehash[k];
-				},
-				__escape: function(str) {
-					return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, __escapehtml.__escapereplace);
-				},
-				__detection: function(data) {
-					return typeof(data) === 'undefined' ? '' : data;
-				}
-			},
-			cache: true
-		};
-		//juicer.set('cache',true);
-		juicer.set('cache',false);
+
+		juicer.set('cache',true);
 		juicer.set('errorhandling',false);
 		juicer.set('strip',true);
 		juicer.set('detection',false);
+
 		for(var i=0;i<1000;i++) {
 			juicer(tpl,data);
 		}
+
 		var endtimestamp=new Date().getTime();
 		var exhausttime=endtimestamp-starttimestamp;
+
 		document.write(juicer(tpl,data));
 		document.write('run time: '+exhausttime);
+
 		console.log(juicer(tpl).render.toString());
 		console.log(exhausttime);
 	</script>
