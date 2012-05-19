@@ -509,13 +509,15 @@
             tpl = this.__toNative(tpl, options);
 
             this._render = new Function('_, _method', tpl);
+
             this.render = function(_, _method) {
                 if(!_method || _method !== that.options) {
                     _method = __creator(_method, that.options);
                 }
-                //console.log(_method);
+
                 return _that._render.call(this, _, _method);
             };
+
             return this;
         };
     };
