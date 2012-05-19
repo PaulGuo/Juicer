@@ -60,6 +60,26 @@ YUI.add('juicer',function(Y) {
         throw(error);
     };
 
+    var __creator = function(o, proto) {
+        o = o !== Object(o) ? {} : o;
+
+        if(o.__proto__) {
+            o.__proto__ = proto;
+            return o;
+        }
+
+        var _Empty = function() {};
+        var n = new((_Empty).prototype = proto, _Empty);
+
+        for(var i in o) {
+            if(o.hasOwnProperty(i)) {
+                n[i] = o[i];
+            }
+        }
+
+        return n;
+    };
+
     juicer.__cache = {};
     juicer.version = '0.4.0-dev';
 
@@ -272,6 +292,10 @@ YUI.add('juicer',function(Y) {
     };
 
     juicer.compile = function(tpl, options) {
+        if(!options || options !== this.options) {
+            options = __creator(options, this.options);
+        }
+
         try {
             var engine = this.__cache[tpl] ? 
                 this.__cache[tpl] : 
@@ -282,6 +306,7 @@ YUI.add('juicer',function(Y) {
             }
             
             return engine;
+
         } catch(e) {
             __throw('Juicer Compile Exception: ' + e.message);
             
@@ -292,6 +317,10 @@ YUI.add('juicer',function(Y) {
     };
 
     juicer.to_html = function(tpl, data, options) {
+        if(!options || options !== this.options) {
+            options = __creator(options, this.options);
+        }
+
         return this.compile(tpl, options).render(data, options);
     };
 
