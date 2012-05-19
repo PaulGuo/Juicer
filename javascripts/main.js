@@ -25,4 +25,20 @@ $(document).ready(function() {
 		//$('.J_result').html(result).fadeOut().fadeIn();
 		$('.J_result').html(result);
 	});
+
+    var breath = [];
+    
+    breath[0] = function() {
+        $('#logo img').fadeTo(1000, 0.3, function() {
+            breath[1]();
+        });
+    };
+
+    breath[1] = function() {
+        $('#logo img').fadeTo(2000, 1, function() {
+            breath[0]();
+        });
+    };
+
+    breath[1]();
 });

@@ -51,7 +51,7 @@ a {
 }
 
 #intro #docsbutton,#intro #demobutton {
-	background-color:#9A9F8B;
+	background-color:#61ad3c;
 }
 
 #intro .button {
@@ -59,8 +59,8 @@ a {
 	font-size:14px;
 	text-transform:uppercase;
 	padding:6px 12px;
-	margin:0 1px;
-	color:#46483e;
+	margin:0 3px;
+	color:#fff;
 
 	-webkit-border-radius:4px;
 	-moz-border-radius:4px;
@@ -194,4 +194,11 @@ a {
 	padding-top:15px;
 	font-family:'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Verdana, Tahoma,sans-serif;
 	text-align:center;
+}
+
+#github img {
+    position:absolute;
+    top:0;
+    right:0;
+    border:0;
 }

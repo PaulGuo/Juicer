@@ -19,6 +19,7 @@
 什么 Bug 抑或是一些好的建议都欢迎在 <a href="https://github.com/PaulGuo/Juicer/issues">Github Issue</a>
 上提交。</p>
 
+<a name="!about"></a>
 <h4>名字的由来</h4>
 
 <p>倘若我们把数据比作新鲜可口的水果，把模板看做是水，Juicer 就是把水果和水榨出我们需要的HTML代码片段的榨汁机。</p>
@@ -44,6 +45,12 @@
 
 <pre><code>var compiled_tpl = juicer(tpl);
 var html = compiled_tpl.render(data);
+</code></pre>
+
+<p>&gt; 注册/注销自定义函数，在下边 ${变量} 中会有实例.</p>
+
+<pre><code>juicer.register('function_name', function);
+juicer.unregister('function_name');
 </code></pre>
 
 <h4>默认参数配置</h4>
@@ -75,6 +82,7 @@ juicer.set('cache',false);
 <p>Juicer 默认会对编译后的模板进行缓存，从而避免同一模板多次数据渲染时候重复编译所耗的时间，
 如无特殊需要，强烈不建议关闭默认参数中的 cache，这么做将会令 Juicer 缓存失效从而降低性能.</p>
 
+<a name="!syntax"></a>
 <h2>* 语法</h2>
 
 <h4>a. ${变量}</h4>
@@ -103,108 +111,138 @@ var tpl = [
 ].join('');
 
 var links = function(data) {
-	return '&lt;a href="' + data.href + '" alt="' + data.alt + '"';
+	return '&lt;a href="' + data.href + '" alt="' + data.alt + '" /&gt;';
 };
 
+juicer.register('links', links); //注册自定义函数
 juicer(tpl, json);
 </code></pre>
 
-<strong>escape/unescape</strong>
+<p>上述代码执行后我们会发现结果是这样的：</p>
 
-<p>it is noteworthy that, for security reasons, ${output} will do escape to the output, if you do not want it to be escaped, you can use $${output} to avoid this. 
-for example:</p>
-
-<pre><code>var json={
-	value:'&lt;strong&gt;juicer&lt;/strong&gt;'
-};
-
-var escapetpl='${value}';
-var unescapetpl='$${value}';
-
-juicer(escapetpl,json); //it'll be '&amp;lt;strong&amp;gt;juicer&amp;lt;/strong&amp;gt;'
-juicer(unescapetpl,json); //it'll be '&lt;strong&gt;juicer&lt;/strong&gt;'
+<pre><code>&amp;lt;a href=&amp;quot;http://juicer.name&amp;quot; alt=&amp;quot;Juicer&amp;quot; &lt;br /&gt;
+&amp;lt;a href=&amp;quot;http://benben.cc&amp;quot; alt=&amp;quot;Benben&amp;quot; &lt;br /&gt;
+&amp;lt;a href=&amp;quot;http://ued.taobao.com&amp;quot; alt=&amp;quot;Taobao UED&amp;quot; &lt;br /&gt;
 </code></pre>
 
-<h4>b. {@each} ... {@/each}</h4>
+<p>可以看得出，结果被转义了，如果我们上边使用 $${item|links} 就会得到我们预期的结果，这就是下边即将提到的避免转义。</p>
 
-<p>when you need iterate a list, you can use `each` like this.</p>
+<strong>转义/避免转义</strong>
+
+<p>出于安全角度的考虑，${变量} 在输出之前会对其内容进行转义，如果你不想输出结果被转义，可以使用 $${变量} 来避免这种情况。
+例如：</p>
+
+<pre><code>var json = {
+    value: '&lt;strong&gt;juicer&lt;/strong&gt;'
+};
+
+var escape_tpl='${value}';
+var unescape_tpl='$${value}';
+
+juicer(escape_tpl, json); //输出 '&amp;lt;strong&amp;gt;juicer&amp;lt;/strong&amp;gt;'
+juicer(unescape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
+</code></pre>
+
+<h4>b. 循环遍历 {@each} ... {@/each}</h4>
+
+<p>如果你需要对数组进行循环遍历的操作，就可以像这样使用 `each` .</p>
 
 <pre><code>{@each list as item}
 	${item.prop}
 {@/each}
 </code></pre>
 
-<p>you can also get the index while eaching.</p>
+<p>如果遍历过程中想取得当前的索引值，也很方便.</p>
 
-<pre><code>{@each list as item,index}
+<pre><code>{@each list as item, index}
 	${item.prop}
-	${index} //index
+	${index} //当前索引
 {@/each}
 </code></pre>
 
-<h4>c. {@if} ... {@else} ... {@/if}</h4>
+<h4>c. 判断 {@if} ... {@else if} ... {@else} ... {@/if}</h4>
 
-<p>you can also use if-else if you need.</p>
+<p>我们也会经常碰到对数据进行逻辑判断的时候.</p>
 
 <pre><code>{@each list as item,index}
-	{@if index===3}
-		the index is 3, the value is ${item.prop}
-	{@else}
-		the index is not 3, the value is ${item.prop}
-	{@/if}
+    {@if index===3}
+        the index is 3, the value is ${item.prop}
+    {@else if index === 4}
+        the index is 4, the value is ${item.prop}
+    {@else}
+        the index is not 3, the value is ${item.prop}
+    {@/if}
 {@/each}
 </code></pre>
 
-<h4>d. {# comment}</h4>
+<h4>d. 注释 {# 注释内容}</h4>
 
-<p>you can also write comments in the template code to facilitate future management.</p>
+<p>为了后续代码的可维护性和可读性，我们可以在模板中增加注释.</p>
 
-<pre><code>{# some comment here}</code></pre>
+<pre><code>{# 这里是注释内容}</code></pre>
 
-<h2>* running on the node.js environment</h2>
+<a name="!node.js"></a>
+<h2>* 在 Node.js 环境中运行</h2>
 
-<pre><code>bash: npm install juicer
-var juicer=require('juicer');
-var html=juicer(tpl,data);
+<pre><code>在命令行中执行:
+npm install juicer
+
+在代码中这么引入:
+var juicer = require('juicer');
+var html = juicer(tpl, data);
 </code></pre>
 
-<h2>* demo</h2>
+<a name="!demo"></a>
+<h2>* 一个完整的例子</h2>
 
-<pre><code>&lt;ul&gt;
-	{@each list as it,index}
-		&lt;li&gt;${it.name} (index: ${index})&lt;/li&gt;
-	{@/each}
-	{@each blah as it}
-		&lt;li&gt;
-			num: ${it.num} &lt;br /&gt;
-			{@if it.num==3}
-				{@each it.inner as it2}
-					${it2.time} &lt;br /&gt;
-				{@/each}
-			{@/if}
-		&lt;/li&gt;
-	{@/each}
-&lt;/ul&gt;
+<pre><code>HTML 代码:
 
-var data={
-	list:[
-		{name:'guokai',show:true},
-		{name:'benben',show:false},
-		{name:'dierbaby',show:true}
-	],
-	blah:[
-		{num:1},
-		{num:2},
-		{num:3,inner:[
-			{'time':'15:00'},
-			{'time':'16:00'},
-			{'time':'17:00'},
-			{'time':'18:00'}
-		]},
-		{num:4}
-	]
+&lt;script id="tpl" type="text/template"&gt;
+    &lt;ul&gt;
+        {@each list as it,index}
+            &lt;li&gt;${it.name} (index: ${index})&lt;/li&gt;
+        {@/each}
+        {@each blah as it}
+            &lt;li&gt;
+                num: ${it.num} &lt;br /&gt;
+                {@if it.num==3}
+                    {@each it.inner as it2}
+                        ${it2.time} &lt;br /&gt;
+                    {@/each}
+                {@/if}
+            &lt;/li&gt;
+        {@/each}
+    &lt;/ul&gt;
+&lt;/script&gt;
+
+Javascript 代码:
+
+var data = {
+    list: [
+        {name:' guokai', show: true},
+        {name:' benben', show: false},
+        {name:' dierbaby', show: true}
+    ],
+    blah: [
+        {num: 1},
+        {num: 2},
+        {num: 3, inner:[
+            {'time': '15:00'},
+            {'time': '16:00'},
+            {'time': '17:00'},
+            {'time': '18:00'}
+        ]},
+        {num: 4}
+    ]
 };
+
+var tpl = document.getElementById('tpl').innerHTML;
+var html = juicer(tpl, data);
 </code></pre>
+
+<div style="display:none;">
+    <script src="http://s15.cnzz.com/stat.php?id=4147240&web_id=4147240" language="JavaScript"></script>
+</div>
 
 </body>
 </html>
