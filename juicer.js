@@ -34,7 +34,7 @@
             '/': '&#x2f;'
         },
         escapereplace: function(k) {
-            return this.escapehash[k];
+            return __escapehtml.escapehash[k];
         },
         escaping: function(str) {
             return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, this.escapereplace);
