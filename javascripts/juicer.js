@@ -252,7 +252,7 @@
             '/': '&#x2f;'
         },
         escapereplace: function(k) {
-            return this.escapehash[k];
+            return __escapehtml.escapehash[k];
         },
         escaping: function(str) {
             return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, this.escapereplace);
@@ -319,8 +319,10 @@
         strip: true,
         errorhandling: true,
         detection: true,
-        __escapehtml: __escapehtml,
-        __throw: __throw
+        _method: {
+            __escapehtml: __escapehtml,
+            __throw: __throw
+        }
     };
 
     juicer.set = function(conf, value) {
@@ -335,6 +337,24 @@
                     this.options[i] = conf[i];
                 }
             }
+        }
+    };
+
+    juicer.register = function(fname, fn) {
+        var _method = this.options._method;
+
+        if(_method.hasOwnProperty(fname)) {
+            return false;
+        }
+
+        return _method[fname] = fn;
+    };
+
+    juicer.unregister = function(fname) {
+        var _method = this.options._method;
+
+        if(_method.hasOwnProperty(fname)) {
+            return delete _method[fname];
         }
     };
 
@@ -416,7 +436,7 @@
             //exception handling
             if(!options || options.errorhandling !== false) {
                 tpl = '<% try { %>' + tpl;
-                tpl += '<% } catch(e) {__throw("Juicer Render Exception: "+e.message);} %>';
+                tpl += '<% } catch(e) {_method.__throw("Juicer Render Exception: "+e.message);} %>';
             }
 
             return tpl;
@@ -511,8 +531,8 @@
             this._render = new Function('_, _method', tpl);
 
             this.render = function(_, _method) {
-                if(!_method || _method !== that.options) {
-                    _method = __creator(_method, that.options);
+                if(!_method || _method !== that.options._method) {
+                    _method = __creator(_method, that.options._method);
                 }
 
                 return _that._render.call(this, _, _method);
@@ -552,7 +572,7 @@
             options = __creator(options, this.options);
         }
 
-        return this.compile(tpl, options).render(data, options);
+        return this.compile(tpl, options).render(data, options._method);
     };
 
     typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
