@@ -17,6 +17,7 @@
 <script src="templates/mustache.js"></script>
 <script src="templates/baidu.template.js"></script>
 <script src="templates/jquery.tmpl.js"></script>
+<script src="templates/handlebars-1.0.0.beta.6.js"></script>
 
 <!-- artTemplate 的模板 -->
 <script id="template" type="text/tmpl">
@@ -112,6 +113,15 @@
         <& val = @list[i]; &>
         <li> <&= val.index &>. 用户: <&= val.user &>； 网站：<&= val.site &></li> 
   <& } &>
+</ul>
+</script>
+
+<!-- handlebars 的模板 -->
+<script id="Handlebars" type="text/tmpl">
+<ul>
+  {{#list}}
+        <li> {{{index}}}. 用户:{{{user}}}； 网站：{{{site}}}</li> 
+  {{/list}}
 </ul>
 </script>
 
@@ -216,6 +226,17 @@ var testList = [
             var tmpl = document.getElementById('Mustache').innerHTML;
             for (var i = 0; i < number; i ++) {
                 Mustache.to_html(tmpl, data);
+            }
+        }
+    },
+
+    {
+        name: 'Handlebars',
+        tester: function () {
+            var tmpl = document.getElementById('Handlebars').innerHTML;
+            var compiled = Handlebars.compile(tmpl);
+            for (var i = 0; i < number; i ++) {
+                compiled(data);
             }
         }
     }
