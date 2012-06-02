@@ -7,13 +7,20 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.4.0-dev
+    Version: 0.4.1-dev
 */
 
 (function() {
     var juicer = function() {
         var args = [].slice.call(arguments);
         args.push(juicer.options);
+
+        if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
+            args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($,$id) {
+                var elem = document.getElementById($id);
+                return elem ? (elem.value || elem.innerHTML) : $;
+            });
+        }
         
         if(arguments.length == 1) {
             return juicer.compile.apply(juicer, args);
@@ -68,8 +75,10 @@
             return o;
         }
 
-        var _Empty = function() {};
-        var n = new((_Empty).prototype = proto, _Empty);
+        var empty = function() {};
+        var n = Object.create ? 
+            Object.create(proto) : 
+            new(empty.prototype = proto, empty);
 
         for(var i in o) {
             if(o.hasOwnProperty(i)) {
@@ -81,7 +90,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.4.0-dev';
+    juicer.version = '0.4.1-dev';
 
     juicer.settings = {
         forstart:      /{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
@@ -101,10 +110,10 @@
         strip: true,
         errorhandling: true,
         detection: true,
-        _method: {
+        _method: __creator({
             __escapehtml: __escapehtml,
             __throw: __throw
-        }
+        }, this)
     };
 
     juicer.set = function(conf, value) {

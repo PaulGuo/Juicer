@@ -101,10 +101,10 @@ YUI.add('juicer',function(Y) {
         strip: true,
         errorhandling: true,
         detection: true,
-        _method: {
+        _method: __creator({
             __escapehtml: __escapehtml,
             __throw: __throw
-        }
+        }, this)
     };
 
     juicer.set = function(conf, value) {
