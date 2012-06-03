@@ -17,7 +17,7 @@
 
         if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
             args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($,$id) {
-                var elem = document.getElementById($id);
+                var elem = document && document.getElementById($id);
                 return elem ? (elem.value || elem.innerHTML) : $;
             });
         }
