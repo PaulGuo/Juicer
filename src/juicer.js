@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.4.1-dev
+    Version: 0.5.0-pre
 */
 
 (function() {
@@ -90,7 +90,18 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.4.1-dev';
+    juicer.version = '0.5.0-pre';
+
+    juicer.tags = {
+        operationOpen: '{@',
+        operationClose: '}',
+        interpolateOpen: '\\${',
+        interpolateClose: '}',
+        noneencodeOpen: '\\$\\${',
+        noneencodeClose: '}',
+        commentOpen: '\\{#',
+        commentClose: '\\}'
+    };
 
     juicer.settings = {
         forstart:      /{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
@@ -116,16 +127,63 @@
         }, this)
     };
 
+    juicer.tagInit = function() {
+        var forstart = juicer.tags.operationOpen + 'each\\s*([\\w\\.]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
+        var forend = juicer.tags.operationOpen + '\\/each' + juicer.tags.operationClose;
+        var ifstart = juicer.tags.operationOpen + 'if\\s*([^}]*?)' + juicer.tags.operationClose;
+        var ifend = juicer.tags.operationOpen + '\\/if' + juicer.tags.operationClose;
+        var elsestart = juicer.tags.operationOpen + 'else' + juicer.tags.operationClose;
+        var elseifstart = juicer.tags.operationOpen + 'else if\\s*([^}]*?)' + juicer.tags.operationClose;
+        var interpolate = juicer.tags.interpolateOpen + '([\\s\\S]+?)' + juicer.tags.interpolateClose;
+        var noneencode = juicer.tags.noneencodeOpen + '([\\s\\S]+?)' + juicer.tags.noneencodeClose;
+        var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
+        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?),(\\d+?)\\)' + juicer.tags.operationClose;
+
+        juicer.settings.forstart = new RegExp(forstart, 'igm');
+        juicer.settings.forend = new RegExp(forend, 'igm');
+        juicer.settings.ifstart = new RegExp(ifstart, 'igm');
+        juicer.settings.ifend = new RegExp(ifend, 'igm');
+        juicer.settings.elsestart = new RegExp(elsestart, 'igm');
+        juicer.settings.elseifstart = new RegExp(elseifstart, 'igm');
+        juicer.settings.interpolate = new RegExp(interpolate, 'igm');
+        juicer.settings.noneencode = new RegExp(noneencode, 'igm');
+        juicer.settings.inlinecomment = new RegExp(inlinecomment, 'igm');
+        juicer.settings.rangestart = new RegExp(rangestart, 'igm');
+    };
+
+    juicer.tagInit();
+
     juicer.set = function(conf, value) {
+        var that = this;
+
+        var escapePattern = function(v) {
+            return v.replace(/[\$\(\)\[\]\+\^\{\}\?\*\|\.]/igm, function($) {
+                console.log($);
+                return '\\' + $;
+            });
+        };
+
+        var set = function(conf, value) {
+            var tag = conf.match(/^tag::(.*)$/i);
+
+            if(tag) {
+                that.tags[tag[1]] = escapePattern(value);
+                that.tagInit();
+                return;
+            }
+
+            that.options[conf] = value;
+        };
+
         if(arguments.length === 2) {
-            this.options[conf] = value;
+            set(conf, value);
             return;
         }
         
         if(conf === Object(conf)) {
             for(var i in conf) {
                 if(conf.hasOwnProperty(i)) {
-                    this.options[i] = conf[i];
+                    set(i, conf[i]);
                 }
             }
         }
