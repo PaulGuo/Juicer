@@ -13,6 +13,7 @@
 (function() {
     var juicer = function() {
         var args = [].slice.call(arguments);
+
         args.push(juicer.options);
 
         if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
@@ -91,6 +92,7 @@
 
     juicer.__cache = {};
     juicer.version = '0.5.0-pre';
+    juicer.settings = {};
 
     juicer.tags = {
         operationOpen: '{@',
@@ -101,19 +103,6 @@
         noneencodeClose: '}',
         commentOpen: '\\{#',
         commentClose: '\\}'
-    };
-
-    juicer.settings = {
-        forstart:      /{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
-        forend:        /{@\/each}/igm,
-        ifstart:       /{@if\s*([^}]*?)}/igm,
-        ifend:         /{@\/if}/igm,
-        elsestart:     /{@else}/igm,
-        elseifstart:   /{@else if\s*([^}]*?)}/igm,
-        interpolate:   /\${([\s\S]+?)}/igm,
-        noneencode:    /\$\${([\s\S]+?)}/igm,
-        inlinecomment: /{#[^}]*?}/igm,
-        rangestart:    /{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
     };
 
     juicer.options = {
