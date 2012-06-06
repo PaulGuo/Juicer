@@ -1,5 +1,5 @@
 var http=require('http');
-var juicer=require('./juicer');
+var juicer=require('../../src/juicer');
 
 var data={
 	list:[

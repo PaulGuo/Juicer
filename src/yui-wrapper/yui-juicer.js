@@ -7,13 +7,29 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.4.0-dev
+    Version: 0.5.0-pre
 */
 
 YUI.add('juicer',function(Y) {
+
+    // This is the main function for not only compiling but also rendering.
+    // there's at least two parameters need to be provided, one is the tpl, 
+    // another is the data, the tpl can either be a string, or an id like #id.
+    // if only tpl was given, it'll return the compiled reusable function.
+    // if tpl and data were given at the same time, it'll return the rendered 
+    // result immediately.
+
     var juicer = function() {
         var args = [].slice.call(arguments);
+
         args.push(juicer.options);
+
+        if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
+            args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($,$id) {
+                var elem = document && document.getElementById($id);
+                return elem ? (elem.value || elem.innerHTML) : $;
+            });
+        }
         
         if(arguments.length == 1) {
             return juicer.compile.apply(juicer, args);
@@ -68,8 +84,10 @@ YUI.add('juicer',function(Y) {
             return o;
         }
 
-        var _Empty = function() {};
-        var n = new((_Empty).prototype = proto, _Empty);
+        var empty = function() {};
+        var n = Object.create ? 
+            Object.create(proto) : 
+            new(empty.prototype = proto, empty);
 
         for(var i in o) {
             if(o.hasOwnProperty(i)) {
@@ -81,19 +99,18 @@ YUI.add('juicer',function(Y) {
     };
 
     juicer.__cache = {};
-    juicer.version = '0.4.0-dev';
+    juicer.version = '0.5.0-pre';
+    juicer.settings = {};
 
-    juicer.settings = {
-        forstart:      /{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
-        forend:        /{@\/each}/igm,
-        ifstart:       /{@if\s*([^}]*?)}/igm,
-        ifend:         /{@\/if}/igm,
-        elsestart:     /{@else}/igm,
-        elseifstart:   /{@else if\s*([^}]*?)}/igm,
-        interpolate:   /\${([\s\S]+?)}/igm,
-        noneencode:    /\$\${([\s\S]+?)}/igm,
-        inlinecomment: /{#[^}]*?}/igm,
-        rangestart:    /{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
+    juicer.tags = {
+        operationOpen: '{@',
+        operationClose: '}',
+        interpolateOpen: '\\${',
+        interpolateClose: '}',
+        noneencodeOpen: '\\$\\${',
+        noneencodeClose: '}',
+        commentOpen: '\\{#',
+        commentClose: '\\}'
     };
 
     juicer.options = {
@@ -107,20 +124,76 @@ YUI.add('juicer',function(Y) {
         }, this)
     };
 
+    juicer.tagInit = function() {
+        var forstart = juicer.tags.operationOpen + 'each\\s*([\\w\\.]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
+        var forend = juicer.tags.operationOpen + '\\/each' + juicer.tags.operationClose;
+        var ifstart = juicer.tags.operationOpen + 'if\\s*([^}]*?)' + juicer.tags.operationClose;
+        var ifend = juicer.tags.operationOpen + '\\/if' + juicer.tags.operationClose;
+        var elsestart = juicer.tags.operationOpen + 'else' + juicer.tags.operationClose;
+        var elseifstart = juicer.tags.operationOpen + 'else if\\s*([^}]*?)' + juicer.tags.operationClose;
+        var interpolate = juicer.tags.interpolateOpen + '([\\s\\S]+?)' + juicer.tags.interpolateClose;
+        var noneencode = juicer.tags.noneencodeOpen + '([\\s\\S]+?)' + juicer.tags.noneencodeClose;
+        var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
+        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?),(\\d+?)\\)' + juicer.tags.operationClose;
+
+        juicer.settings.forstart = new RegExp(forstart, 'igm');
+        juicer.settings.forend = new RegExp(forend, 'igm');
+        juicer.settings.ifstart = new RegExp(ifstart, 'igm');
+        juicer.settings.ifend = new RegExp(ifend, 'igm');
+        juicer.settings.elsestart = new RegExp(elsestart, 'igm');
+        juicer.settings.elseifstart = new RegExp(elseifstart, 'igm');
+        juicer.settings.interpolate = new RegExp(interpolate, 'igm');
+        juicer.settings.noneencode = new RegExp(noneencode, 'igm');
+        juicer.settings.inlinecomment = new RegExp(inlinecomment, 'igm');
+        juicer.settings.rangestart = new RegExp(rangestart, 'igm');
+    };
+
+    juicer.tagInit();
+
+    // Using this method to set the options by given conf-name and conf-value,
+    // you can also provide more than one key-value pair wrapped by an object.
+    // this interface also used to custom the template tag delimater, for this
+    // situation, the conf-name must begin with tag::, for example: juicer.set
+    // ('tag::operationOpen', '{@').
+
     juicer.set = function(conf, value) {
+        var that = this;
+
+        var escapePattern = function(v) {
+            return v.replace(/[\$\(\)\[\]\+\^\{\}\?\*\|\.]/igm, function($) {
+                console.log($);
+                return '\\' + $;
+            });
+        };
+
+        var set = function(conf, value) {
+            var tag = conf.match(/^tag::(.*)$/i);
+
+            if(tag) {
+                that.tags[tag[1]] = escapePattern(value);
+                that.tagInit();
+                return;
+            }
+
+            that.options[conf] = value;
+        };
+
         if(arguments.length === 2) {
-            this.options[conf] = value;
+            set(conf, value);
             return;
         }
         
         if(conf === Object(conf)) {
             for(var i in conf) {
                 if(conf.hasOwnProperty(i)) {
-                    this.options[i] = conf[i];
+                    set(i, conf[i]);
                 }
             }
         }
     };
+
+    // Before you're using custom functions in your template like ${name | fnName},
+    // you need to register this fn by juicer.register('fnName', fn).
 
     juicer.register = function(fname, fn) {
         var _method = this.options._method;
@@ -131,6 +204,9 @@ YUI.add('juicer',function(Y) {
 
         return _method[fname] = fn;
     };
+
+    // remove the registered function in the memory by the provided function name.
+    // for example: juicer.unregister('fnName').
 
     juicer.unregister = function(fname) {
         var _method = this.options._method;
@@ -357,5 +433,6 @@ YUI.add('juicer',function(Y) {
         return this.compile(tpl, options).render(data, options._method);
     };
 
-    Y.juicer=juicer;
-},'0.4.0-dev');
+    Y.juicer = juicer;
+
+},'0.5.0-pre');
