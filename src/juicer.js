@@ -11,6 +11,14 @@
 */
 
 (function() {
+
+    // This is the main function for not only compiling but also rendering.
+    // there's at least two parameters need to be provided, one is the tpl, 
+    // another is the data, the tpl can either be a string, or an id like #id.
+    // if only tpl was given, it'll return the compiled reusable function.
+    // if tpl and data were given at the same time, it'll return the rendered 
+    // result immediately.
+
     var juicer = function() {
         var args = [].slice.call(arguments);
 
@@ -142,6 +150,12 @@
 
     juicer.tagInit();
 
+    // Using this method to set the options by given conf-name and conf-value,
+    // you can also provide more than one key-value pair wrapped by an object.
+    // this interface also used to custom the template tag delimater, for this
+    // situation, the conf-name must begin with tag::, for example: juicer.set
+    // ('tag::operationOpen', '{@').
+
     juicer.set = function(conf, value) {
         var that = this;
 
@@ -178,6 +192,9 @@
         }
     };
 
+    // Before you're using custom functions in your template like ${name | fnName},
+    // you need to register this fn by juicer.register('fnName', fn).
+
     juicer.register = function(fname, fn) {
         var _method = this.options._method;
 
@@ -187,6 +204,9 @@
 
         return _method[fname] = fn;
     };
+
+    // remove the registered function in the memory by the provided function name.
+    // for example: juicer.unregister('fnName').
 
     juicer.unregister = function(fname) {
         var _method = this.options._method;
