@@ -25,7 +25,8 @@
         args.push(juicer.options);
 
         if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
-            args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($,$id) {
+            args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($, $id) {
+                var document = document;
                 var elem = document && document.getElementById($id);
                 args[0] = elem ? (elem.value || elem.innerHTML) : $;
             });
