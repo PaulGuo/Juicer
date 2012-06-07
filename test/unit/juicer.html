@@ -9,7 +9,15 @@
 </head>
 <body>
     <div id="qunit"></div>
-    <script type="text/tmpl" id="juicer-tmpl">{@if benben === 'cc'}${hello}{@/if}</script>
+    <script type="text/tmpl" id="juicer-tmpl">
+        {@if benben === 'cc'}
+            ${hello}
+        {@else if benben === '.cc'}
+            ${hello}.cc
+        {@else}
+            ${hello}.jp
+        {@/if}
+    </script>
     <script type="text/javascript" src="test.js"></script>
 </body>
 </html>

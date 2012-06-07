@@ -134,7 +134,7 @@
         var interpolate = juicer.tags.interpolateOpen + '([\\s\\S]+?)' + juicer.tags.interpolateClose;
         var noneencode = juicer.tags.noneencodeOpen + '([\\s\\S]+?)' + juicer.tags.noneencodeClose;
         var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
-        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?),(\\d+?)\\)' + juicer.tags.operationClose;
+        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?)\\s*,\\s*(\\d+?)\\)' + juicer.tags.operationClose;
 
         juicer.settings.forstart = new RegExp(forstart, 'igm');
         juicer.settings.forend = new RegExp(forend, 'igm');
@@ -161,7 +161,6 @@
 
         var escapePattern = function(v) {
             return v.replace(/[\$\(\)\[\]\+\^\{\}\?\*\|\.]/igm, function($) {
-                console.log($);
                 return '\\' + $;
             });
         };
@@ -286,7 +285,7 @@
                 //range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
                     var _iterate = 'j' + _counter++;
-                    return '<% for(var ' + _iterate + '=0;' + _iterate + '<' + (end - start) + ';' + _iterate + '++) {' +
+                    return '<% for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {' +
                                 'var ' + _name + '=' + _iterate + ';' +
                         ' %>';
                 });
