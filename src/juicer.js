@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.0-pre
+    Version: 0.5.0-stable
 */
 
 (function() {
@@ -99,7 +99,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.0-pre';
+    juicer.version = '0.5.0-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -433,4 +433,5 @@
     };
 
     typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
+
 })();

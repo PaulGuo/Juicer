@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.0-pre
+    Version: 0.5.0-stable
 */
 
 YUI.add('juicer',function(Y) {
@@ -27,7 +27,7 @@ YUI.add('juicer',function(Y) {
         if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
             args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($,$id) {
                 var elem = document && document.getElementById($id);
-                return elem ? (elem.value || elem.innerHTML) : $;
+                args[0] = elem ? (elem.value || elem.innerHTML) : $;
             });
         }
         
@@ -99,7 +99,7 @@ YUI.add('juicer',function(Y) {
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.0-pre';
+    juicer.version = '0.5.0-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -134,7 +134,7 @@ YUI.add('juicer',function(Y) {
         var interpolate = juicer.tags.interpolateOpen + '([\\s\\S]+?)' + juicer.tags.interpolateClose;
         var noneencode = juicer.tags.noneencodeOpen + '([\\s\\S]+?)' + juicer.tags.noneencodeClose;
         var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
-        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?),(\\d+?)\\)' + juicer.tags.operationClose;
+        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?)\\s*,\\s*(\\d+?)\\)' + juicer.tags.operationClose;
 
         juicer.settings.forstart = new RegExp(forstart, 'igm');
         juicer.settings.forend = new RegExp(forend, 'igm');
@@ -161,7 +161,6 @@ YUI.add('juicer',function(Y) {
 
         var escapePattern = function(v) {
             return v.replace(/[\$\(\)\[\]\+\^\{\}\?\*\|\.]/igm, function($) {
-                console.log($);
                 return '\\' + $;
             });
         };
@@ -286,7 +285,7 @@ YUI.add('juicer',function(Y) {
                 //range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
                     var _iterate = 'j' + _counter++;
-                    return '<% for(var ' + _iterate + '=0;' + _iterate + '<' + (end - start) + ';' + _iterate + '++) {' +
+                    return '<% for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {' +
                                 'var ' + _name + '=' + _iterate + ';' +
                         ' %>';
                 });
@@ -435,4 +434,4 @@ YUI.add('juicer',function(Y) {
 
     Y.juicer = juicer;
 
-},'0.5.0-pre');
+},'0.5.0-stable');
