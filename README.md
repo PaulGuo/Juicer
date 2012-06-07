@@ -1,6 +1,6 @@
 <h2>Juicer 中文文档</h2>
 
-<p><strong>当前最新版本: 0.4.0-dev</strong></p>
+<p><strong>当前最新版本: 0.5.0-stable</strong></p>
 
 <p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
 除此之外，它还可以在 Node.js 环境中运行。</p>
@@ -42,6 +42,20 @@ var html = compiled_tpl.render(data);
 
 <pre><code>juicer.register('function_name', function);
 juicer.unregister('function_name');
+</code></pre>
+
+<p>&gt; 自定义模板语法边界符，下边是 Juicer 默认的边界符。你可以借此解决 Juicer 模板语法同某些后端语言模板语法冲突的情况.</p>
+
+<pre><code>juicer.set({
+    'tag::operationOpen': '{@',
+    'tag::operationClose': '}',
+    'tag::interpolateOpen': '${',
+    'tag::interpolateClose': '}',
+    'tag::noneencodeOpen': '$${',
+    'tag::noneencodeClose': '}',
+    'tag::commentOpen': '{#',
+    'tag::commentClose': '}'
+});
 </code></pre>
 
 <h4>默认参数配置</h4>
@@ -171,6 +185,15 @@ juicer(unescape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
 <p>为了后续代码的可维护性和可读性，我们可以在模板中增加注释.</p>
 
 <pre><code>{# 这里是注释内容}</code></pre>
+
+<h4>e. 辅助循环 {@each i in range(m, n)}</h4>
+
+<p>辅助循环是 Juicer 为你精心设置的一个语法糖，也许你会在某种情境下需要它.</p>
+
+<pre><code>{each i in range(5, 10)}
+    ${i}; //输出 5;6;7;8;9;
+{@/each}
+</code></pre>
 
 <a name="!node.js"></a>
 <h2>* 在 Node.js 环境中运行</h2>
