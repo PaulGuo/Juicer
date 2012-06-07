@@ -1,13 +1,13 @@
 {
-	"name":"juicer",
-	"version":"0.4.0-dev",
-	"description":"a high-performance lightweight javascript template engine",
-	"homepage":"http://juicer.name",
-	"author":"juicer.js authors {badkaikai@gmail.com | http://benben.cc}",
-	"keywords":["juicer","template","templates","juicerjs","engine","javascript"],
-	"repository":{
-		"type":"git",
-		"url":"git@github.com:PaulGuo/Juicer.git"
+	"name": "juicer",
+	"version": "0.5.0-pre",
+	"description": "a high-performance lightweight javascript template engine",
+	"homepage": "http://juicer.name",
+	"author": "juicer.js authors {badkaikai@gmail.com | http://benben.cc}",
+	"keywords": ["juicer","template","templates","juicerjs","engine","javascript"],
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:PaulGuo/Juicer.git"
 	},
-	"main":"./juicer"
+	"main": "./src/juicer"
 }
