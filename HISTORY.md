@@ -18,3 +18,10 @@ Juicer Change History
 * Support custom the tags by `juicer.set('tag::someTag', 'yourTag')`.
 
 * Fixed `each … range` bug that ranges are incorrect.
+
+0.5.1
+-----
+
+* Fixed `#id` support invalid bug because of `var document`.
+
+* Fixed `lexical analyze` bug (`Issue #3`), for example: `{@if a == b}` will throw b is undefined.

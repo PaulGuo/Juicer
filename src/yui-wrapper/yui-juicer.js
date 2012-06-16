@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.0-stable
+    Version: 0.5.1-stable
 */
 
 YUI.add('juicer',function(Y) {
@@ -26,8 +26,8 @@ YUI.add('juicer',function(Y) {
 
         if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
             args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($, $id) {
-                var document = document;
-                var elem = document && document.getElementById($id);
+                var _document = document;
+                var elem = _document && _document.getElementById($id);
                 args[0] = elem ? (elem.value || elem.innerHTML) : $;
             });
         }
@@ -100,7 +100,7 @@ YUI.add('juicer',function(Y) {
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.0-stable';
+    juicer.version = '0.5.1-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -243,7 +243,7 @@ YUI.add('juicer',function(Y) {
             var _counter = 0;
             
             tpl = tpl
-                //for expression
+                // for expression
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
                     var _iterate = 'i' + _counter++;
@@ -254,36 +254,36 @@ YUI.add('juicer',function(Y) {
                 })
                 .replace(juicer.settings.forend, '<% } %>')
 
-                //if expression
+                // if expression
                 .replace(juicer.settings.ifstart, function($, condition) {
                     return '<% if(' + condition + ') { %>';
                 })
                 .replace(juicer.settings.ifend, '<% } %>')
 
-                //else expression
+                // else expression
                 .replace(juicer.settings.elsestart, function($) {
                     return '<% } else { %>';
                 })
 
-                //else if expression
+                // else if expression
                 .replace(juicer.settings.elseifstart, function($, condition) {
                     return '<% } else if(' + condition + ') { %>';
                 })
 
-                //interpolate without escape
+                // interpolate without escape
                 .replace(juicer.settings.noneencode, function($, _name) {
                     return that.__interpolate(_name, false, options);
                 })
 
-                //interpolate with escape
+                // interpolate with escape
                 .replace(juicer.settings.interpolate, function($, _name) {
                     return that.__interpolate(_name, true, options);
                 })
 
-                //clean up comments
+                // clean up comments
                 .replace(juicer.settings.inlinecomment, '')
 
-                //range expression
+                // range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
                     var _iterate = 'j' + _counter++;
                     return '<% for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {' +
@@ -291,7 +291,7 @@ YUI.add('juicer',function(Y) {
                         ' %>';
                 });
 
-            //exception handling
+            // exception handling
             if(!options || options.errorhandling !== false) {
                 tpl = '<% try { %>' + tpl;
                 tpl += '<% } catch(e) {_method.__throw("Juicer Render Exception: "+e.message);} %>';
@@ -307,6 +307,14 @@ YUI.add('juicer',function(Y) {
         this.__lexicalAnalyze = function(tpl) {
             var buffer = [];
             var prefix = '';
+            var reserved = [
+                'if', 'each', 
+                'break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 
+                'finally', 'for', 'function', 'in', 'instanceof', 'new', 'return', 'switch', 
+                'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'null', 'typeof', 
+                'class', 'enum', 'export', 'extends', 'import', 'super', 'implements', 'interface', 
+                'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'const', 'arguments'
+            ];
 
             var indexOf = function(array, item) {
                 if (Array.prototype.indexOf && array.indexOf === Array.prototype.indexOf) {
@@ -323,25 +331,29 @@ YUI.add('juicer',function(Y) {
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
                 
-                if(indexOf(buffer, statement) === -1) {
-                    buffer.push(statement); //fuck ie
+                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1) {
+                    buffer.push(statement); // fuck ie
                 }
+
+                return $;
             };
 
             tpl.replace(juicer.settings.forstart, variableAnalyze).
                 replace(juicer.settings.interpolate, variableAnalyze).
-                replace(juicer.settings.ifstart, variableAnalyze);
+                replace(juicer.settings.ifstart, variableAnalyze).
+                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)]\s*([A-Za-z_]+)/igm, variableAnalyze);
 
             for(var i = 0;i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
             }
+
             return '<% ' + prefix + ' %>';
         };
         
         this.__convert=function(tpl, strip) {
             var buffer = [].join('');
 
-            buffer += "'use strict';"; //use strict mode
+            buffer += "'use strict';"; // use strict mode
             buffer += "var _=_||{};";
             buffer += "var _out='';_out+='";
 
@@ -420,7 +432,7 @@ YUI.add('juicer',function(Y) {
             __throw('Juicer Compile Exception: ' + e.message);
             
             return {
-                render: function() {} //noop
+                render: function() {} // noop
             };
         }
     };
@@ -435,4 +447,4 @@ YUI.add('juicer',function(Y) {
 
     Y.juicer = juicer;
 
-},'0.5.0-stable');
+},'0.5.1-stable');

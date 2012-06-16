@@ -89,6 +89,11 @@ test('custom functions, but using native function without register', function() 
     ok(result.render({hello: 'world#!'}) === 'world%23!', 'Passed!');
 });
 
+test('deep lexical analyze', function() {
+    var result = juicer('{@if a == b}${a}{@/if}{@if b < c}${c}{@/if}{@if a || d}${d}{@/if}{@if a && d}${a}{@/if}', {a: 1, b: 1, c: 2, d: 0});
+    ok(result === '120', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',
