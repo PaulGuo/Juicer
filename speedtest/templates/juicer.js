@@ -7,13 +7,30 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.4.0-dev
+    Version: 0.5.1-stable
 */
 
 (function() {
+
+    // This is the main function for not only compiling but also rendering.
+    // there's at least two parameters need to be provided, one is the tpl, 
+    // another is the data, the tpl can either be a string, or an id like #id.
+    // if only tpl was given, it'll return the compiled reusable function.
+    // if tpl and data were given at the same time, it'll return the rendered 
+    // result immediately.
+
     var juicer = function() {
         var args = [].slice.call(arguments);
+
         args.push(juicer.options);
+
+        if(args[0].match(/^\s*#([\w:\-\.]+)\s*$/igm)) {
+            args[0].replace(/^\s*#([\w:\-\.]+)\s*$/igm, function($, $id) {
+                var _document = document;
+                var elem = _document && _document.getElementById($id);
+                args[0] = elem ? (elem.value || elem.innerHTML) : $;
+            });
+        }
         
         if(arguments.length == 1) {
             return juicer.compile.apply(juicer, args);
@@ -68,8 +85,10 @@
             return o;
         }
 
-        var _Empty = function() {};
-        var n = new((_Empty).prototype = proto, _Empty);
+        var empty = function() {};
+        var n = Object.create ? 
+            Object.create(proto) : 
+            new(empty.prototype = proto, empty);
 
         for(var i in o) {
             if(o.hasOwnProperty(i)) {
@@ -81,19 +100,18 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.4.0-dev';
+    juicer.version = '0.5.1-stable';
+    juicer.settings = {};
 
-    juicer.settings = {
-        forstart:      /{@each\s*([\w\.]*?)\s*as\s*(\w*?)\s*(,\s*\w*?)?}/igm,
-        forend:        /{@\/each}/igm,
-        ifstart:       /{@if\s*([^}]*?)}/igm,
-        ifend:         /{@\/if}/igm,
-        elsestart:     /{@else}/igm,
-        elseifstart:   /{@else if\s*([^}]*?)}/igm,
-        interpolate:   /\${([\s\S]+?)}/igm,
-        noneencode:    /\$\${([\s\S]+?)}/igm,
-        inlinecomment: /{#[^}]*?}/igm,
-        rangestart:    /{@each\s*(\w*?)\s*in\s*range\((\d+?),(\d+?)\)}/igm
+    juicer.tags = {
+        operationOpen: '{@',
+        operationClose: '}',
+        interpolateOpen: '\\${',
+        interpolateClose: '}',
+        noneencodeOpen: '\\$\\${',
+        noneencodeClose: '}',
+        commentOpen: '\\{#',
+        commentClose: '\\}'
     };
 
     juicer.options = {
@@ -101,26 +119,81 @@
         strip: true,
         errorhandling: true,
         detection: true,
-        _method: {
+        _method: __creator({
             __escapehtml: __escapehtml,
             __throw: __throw
-        }
+        }, this)
     };
 
+    juicer.tagInit = function() {
+        var forstart = juicer.tags.operationOpen + 'each\\s*([\\w\\.]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
+        var forend = juicer.tags.operationOpen + '\\/each' + juicer.tags.operationClose;
+        var ifstart = juicer.tags.operationOpen + 'if\\s*([^}]*?)' + juicer.tags.operationClose;
+        var ifend = juicer.tags.operationOpen + '\\/if' + juicer.tags.operationClose;
+        var elsestart = juicer.tags.operationOpen + 'else' + juicer.tags.operationClose;
+        var elseifstart = juicer.tags.operationOpen + 'else if\\s*([^}]*?)' + juicer.tags.operationClose;
+        var interpolate = juicer.tags.interpolateOpen + '([\\s\\S]+?)' + juicer.tags.interpolateClose;
+        var noneencode = juicer.tags.noneencodeOpen + '([\\s\\S]+?)' + juicer.tags.noneencodeClose;
+        var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
+        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?)\\s*,\\s*(\\d+?)\\)' + juicer.tags.operationClose;
+
+        juicer.settings.forstart = new RegExp(forstart, 'igm');
+        juicer.settings.forend = new RegExp(forend, 'igm');
+        juicer.settings.ifstart = new RegExp(ifstart, 'igm');
+        juicer.settings.ifend = new RegExp(ifend, 'igm');
+        juicer.settings.elsestart = new RegExp(elsestart, 'igm');
+        juicer.settings.elseifstart = new RegExp(elseifstart, 'igm');
+        juicer.settings.interpolate = new RegExp(interpolate, 'igm');
+        juicer.settings.noneencode = new RegExp(noneencode, 'igm');
+        juicer.settings.inlinecomment = new RegExp(inlinecomment, 'igm');
+        juicer.settings.rangestart = new RegExp(rangestart, 'igm');
+    };
+
+    juicer.tagInit();
+
+    // Using this method to set the options by given conf-name and conf-value,
+    // you can also provide more than one key-value pair wrapped by an object.
+    // this interface also used to custom the template tag delimater, for this
+    // situation, the conf-name must begin with tag::, for example: juicer.set
+    // ('tag::operationOpen', '{@').
+
     juicer.set = function(conf, value) {
+        var that = this;
+
+        var escapePattern = function(v) {
+            return v.replace(/[\$\(\)\[\]\+\^\{\}\?\*\|\.]/igm, function($) {
+                return '\\' + $;
+            });
+        };
+
+        var set = function(conf, value) {
+            var tag = conf.match(/^tag::(.*)$/i);
+
+            if(tag) {
+                that.tags[tag[1]] = escapePattern(value);
+                that.tagInit();
+                return;
+            }
+
+            that.options[conf] = value;
+        };
+
         if(arguments.length === 2) {
-            this.options[conf] = value;
+            set(conf, value);
             return;
         }
         
         if(conf === Object(conf)) {
             for(var i in conf) {
                 if(conf.hasOwnProperty(i)) {
-                    this.options[i] = conf[i];
+                    set(i, conf[i]);
                 }
             }
         }
     };
+
+    // Before you're using custom functions in your template like ${name | fnName},
+    // you need to register this fn by juicer.register('fnName', fn).
 
     juicer.register = function(fname, fn) {
         var _method = this.options._method;
@@ -131,6 +204,9 @@
 
         return _method[fname] = fn;
     };
+
+    // remove the registered function in the memory by the provided function name.
+    // for example: juicer.unregister('fnName').
 
     juicer.unregister = function(fname) {
         var _method = this.options._method;
@@ -167,7 +243,7 @@
             var _counter = 0;
             
             tpl = tpl
-                //for expression
+                // for expression
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
                     var _iterate = 'i' + _counter++;
@@ -178,44 +254,44 @@
                 })
                 .replace(juicer.settings.forend, '<% } %>')
 
-                //if expression
+                // if expression
                 .replace(juicer.settings.ifstart, function($, condition) {
                     return '<% if(' + condition + ') { %>';
                 })
                 .replace(juicer.settings.ifend, '<% } %>')
 
-                //else expression
+                // else expression
                 .replace(juicer.settings.elsestart, function($) {
                     return '<% } else { %>';
                 })
 
-                //else if expression
+                // else if expression
                 .replace(juicer.settings.elseifstart, function($, condition) {
                     return '<% } else if(' + condition + ') { %>';
                 })
 
-                //interpolate without escape
+                // interpolate without escape
                 .replace(juicer.settings.noneencode, function($, _name) {
                     return that.__interpolate(_name, false, options);
                 })
 
-                //interpolate with escape
+                // interpolate with escape
                 .replace(juicer.settings.interpolate, function($, _name) {
                     return that.__interpolate(_name, true, options);
                 })
 
-                //clean up comments
+                // clean up comments
                 .replace(juicer.settings.inlinecomment, '')
 
-                //range expression
+                // range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
                     var _iterate = 'j' + _counter++;
-                    return '<% for(var ' + _iterate + '=0;' + _iterate + '<' + (end - start) + ';' + _iterate + '++) {' +
+                    return '<% for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {' +
                                 'var ' + _name + '=' + _iterate + ';' +
                         ' %>';
                 });
 
-            //exception handling
+            // exception handling
             if(!options || options.errorhandling !== false) {
                 tpl = '<% try { %>' + tpl;
                 tpl += '<% } catch(e) {_method.__throw("Juicer Render Exception: "+e.message);} %>';
@@ -231,6 +307,14 @@
         this.__lexicalAnalyze = function(tpl) {
             var buffer = [];
             var prefix = '';
+            var reserved = [
+                'if', 'each', 
+                'break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 
+                'finally', 'for', 'function', 'in', 'instanceof', 'new', 'return', 'switch', 
+                'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'null', 'typeof', 
+                'class', 'enum', 'export', 'extends', 'import', 'super', 'implements', 'interface', 
+                'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'const', 'arguments'
+            ];
 
             var indexOf = function(array, item) {
                 if (Array.prototype.indexOf && array.indexOf === Array.prototype.indexOf) {
@@ -247,25 +331,29 @@
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
                 
-                if(indexOf(buffer, statement) === -1) {
-                    buffer.push(statement); //fuck ie
+                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1) {
+                    buffer.push(statement); // fuck ie
                 }
+
+                return $;
             };
 
             tpl.replace(juicer.settings.forstart, variableAnalyze).
                 replace(juicer.settings.interpolate, variableAnalyze).
-                replace(juicer.settings.ifstart, variableAnalyze);
+                replace(juicer.settings.ifstart, variableAnalyze).
+                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)]\s*([A-Za-z_]+)/igm, variableAnalyze);
 
             for(var i = 0;i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
             }
+
             return '<% ' + prefix + ' %>';
         };
         
         this.__convert=function(tpl, strip) {
             var buffer = [].join('');
 
-            buffer += "'use strict';"; //use strict mode
+            buffer += "'use strict';"; // use strict mode
             buffer += "var _=_||{};";
             buffer += "var _out='';_out+='";
 
@@ -344,7 +432,7 @@
             __throw('Juicer Compile Exception: ' + e.message);
             
             return {
-                render: function() {} //noop
+                render: function() {} // noop
             };
         }
     };
@@ -358,4 +446,5 @@
     };
 
     typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
+
 })();
