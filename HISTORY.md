@@ -25,3 +25,10 @@ Juicer Change History
 * Fixed `#id` support invalid bug because of `var document`.
 
 * Fixed `lexical analyze` bug (`Issue #3`), for example: `{@if a == b}` will throw b is undefined.
+
+0.5.2
+-----
+
+* Fixed `lexical analyze` bug (`Issue #4`), for example: `{@if a == true}` will throw `Unexpected token true`.
+
+* Fixed `lexical analyze` bug (`Issue #5`), for example: `{@else if a == b}` will throw a is undefined.
