@@ -84,14 +84,27 @@ test('custom functions with register and unregister', function() {
     ok(result.render({hello: 'world'}) === '', 'Passed!');
 });
 
-test('custom functions, but using native function without register', function() {
+test('custom functions, but using native function without register (IE8+)', function() {
     var result = juicer('${hello | encodeURIComponent}');
+    if(navigator.appVersion.indexOf('MSIE') != -1) {
+        juicer.register('encodeURIComponent', encodeURIComponent);
+    }
     ok(result.render({hello: 'world#!'}) === 'world%23!', 'Passed!');
 });
 
-test('deep lexical analyze', function() {
+test('deep lexical analyze - if', function() {
     var result = juicer('{@if a == b}${a}{@/if}{@if b < c}${c}{@/if}{@if a || d}${d}{@/if}{@if a && d}${a}{@/if}', {a: 1, b: 1, c: 2, d: 0});
     ok(result === '120', 'Passed!');
+});
+
+test('deep lexical analyze - elseif', function() {
+    var result = juicer('{@if a == b}X{@else if encodeURIComponent(content) === "CC%26DD"}$${content}{@/if}', {a: 1, b: 2, content: 'CC&DD'});
+    ok(result === 'CC&DD', 'Passed!');
+});
+
+test('deep lexical analyze - true / function', function() {
+    var result = juicer('{@if a === true}true{@/if}{@if encodeURIComponent(b) === "%26"}function{@/if}', {a: true, b: '&'});
+    ok(result === 'truefunction', 'Passed!');
 });
 
 test('custom tag for if-else and interpolate', function() {

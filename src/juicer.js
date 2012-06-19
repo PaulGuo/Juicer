@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.1-stable
+    Version: 0.5.2-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.1-stable';
+    juicer.version = '0.5.2-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -313,7 +313,8 @@
                 'finally', 'for', 'function', 'in', 'instanceof', 'new', 'return', 'switch', 
                 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'null', 'typeof', 
                 'class', 'enum', 'export', 'extends', 'import', 'super', 'implements', 'interface', 
-                'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'const', 'arguments'
+                'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'const', 'arguments', 
+                'true', 'false', 'undefined', 'NaN'
             ];
 
             var indexOf = function(array, item) {
@@ -332,6 +333,14 @@
                 statement = statement.match(/\w+/igm)[0];
                 
                 if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1) {
+                    
+                    // avoid re-declare native function, if not do this, template 
+                    // `{@if encodeURIComponent(name)}` could be throw undefined.
+                    
+                    if(window && typeof(window[statement]) === 'function' && window[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
+                        return $;
+                    }
+
                     buffer.push(statement); // fuck ie
                 }
 
@@ -341,6 +350,7 @@
             tpl.replace(juicer.settings.forstart, variableAnalyze).
                 replace(juicer.settings.interpolate, variableAnalyze).
                 replace(juicer.settings.ifstart, variableAnalyze).
+                replace(juicer.settings.elseifstart, variableAnalyze).
                 replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)]\s*([A-Za-z_]+)/igm, variableAnalyze);
 
             for(var i = 0;i < buffer.length; i++) {
