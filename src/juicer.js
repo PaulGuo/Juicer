@@ -222,18 +222,24 @@
         this.options = options;
 
         this.__interpolate = function(_name, _escape, options) {
-            var _define = _name.split('|'), _fn = '';
+            var _define = _name.split('|'), _fn = '', _fn_part;
 
             if(_define.length > 1) {
                 _name = _define.shift();
-                _fn = '_method.' + _define.shift();
+                _fn_part = _define.shift().split(',');
+
+                if(_fn_part.length > 1){
+                    _fn = '_method.' + _fn_part.shift()+'.call({}, ' + [_name].concat(_fn_part) + ')';
+                }else{
+                    _fn = '_method.' + _fn_part[0] + '(' + _name + ')';
+                }
+            }else{
+                _fn = _name;
             }
 
             return '<%= ' + (_escape ? '_method.__escapehtml.escaping' : '') + '(' +
                         (!options || options.detection !== false ? '_method.__escapehtml.detection' : '') + '(' +
-                            _fn + '(' +
-                                _name +
-                            ')' +
+                            _fn +
                         ')' +
                     ')' +
                 ' %>';
