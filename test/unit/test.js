@@ -107,6 +107,15 @@ test('deep lexical analyze - true / function', function() {
     ok(result === 'truefunction', 'Passed!');
 });
 
+test('support arguments when using helper function, like ${vo.key | fn, arg1, agr2, agr3}', function() {
+    var result;
+    juicer.register('argumentsTest', function(val, arg1, arg2, arg3) {
+        return val + '.' + arg1 + arg2 + arg3;
+    });
+    result = juicer('${argumentsTestValue | argumentsTest, 1, 2, "three"}', {argumentsTestValue: 'argumentsTestValue&'});
+    ok(result === 'argumentsTestValue&amp;.12three', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',
