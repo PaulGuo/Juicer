@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.2-stable
+    Version: 0.5.3-stable
 */
 
 YUI.add('juicer',function(Y) {
@@ -100,7 +100,7 @@ YUI.add('juicer',function(Y) {
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.2-stable';
+    juicer.version = '0.5.3-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -222,18 +222,17 @@ YUI.add('juicer',function(Y) {
         this.options = options;
 
         this.__interpolate = function(_name, _escape, options) {
-            var _define = _name.split('|'), _fn = '';
+            var _define = _name.split('|'), _fn = _define[0] || '', _cluster;
 
             if(_define.length > 1) {
                 _name = _define.shift();
-                _fn = '_method.' + _define.shift();
+                _cluster = _define.shift().split(',');
+                _fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
             }
 
             return '<%= ' + (_escape ? '_method.__escapehtml.escaping' : '') + '(' +
                         (!options || options.detection !== false ? '_method.__escapehtml.detection' : '') + '(' +
-                            _fn + '(' +
-                                _name +
-                            ')' +
+                            _fn +
                         ')' +
                     ')' +
                 ' %>';
