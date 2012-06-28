@@ -52,9 +52,14 @@ test('id support and if-else statement', function() {
     ok(result.render({benben: '.us', hello: 'hello world'}).replace(/\s+/igm, '') === 'helloworld.jp', 'Passed!');
 });
 
-test('each statement', function() {
+test('each statement [Array]', function() {
     var result = juicer('{@each list as o, i}${o},${i};{@/each}');
     ok(result.render({list: ['a', 'b', 'c']}) === 'a,0;b,1;c,2;', 'Passed!');
+});
+
+test('each statement [Object]', function() {
+    var result = juicer('{@each list as o, i}${o},${i};{@/each}');
+    ok(result.render({list: {'k1': 'v1', 'k2': 'v2', 'k3': 'v3'}}) === 'v1,k1;v2,k2;v3,k3;', 'Passed!');
 });
 
 test('multi-layer each statement with multi-layer if statement', function() {
@@ -81,6 +86,13 @@ test('custom functions with register and unregister', function() {
     juicer.register('fn', fn);
     ok(result.render({hello: 'world'}) === 'world.', 'Passed!');
     juicer.unregister('fn');
+    if(navigator.appVersion.indexOf('MSIE') != -1) {
+        var ieVersion = navigator.appVersion.match(/MSIE\s*?(\d)/i)[1];
+        if(ieVersion <= 8) {
+            raises(function() {result.render({hello: 'world'})}, 'lower IE8 will throw error to pass!');
+            return;
+        }
+    }
     ok(result.render({hello: 'world'}) === '', 'Passed!');
 });
 
