@@ -458,4 +458,4 @@ YUI.add('juicer',function(Y) {
 
     Y.juicer = juicer;
 
-},'0.5.2-stable');
+},'0.5.3-stable');
