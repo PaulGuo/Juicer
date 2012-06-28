@@ -37,3 +37,5 @@ Juicer Change History
 -----
 
 * Added `arguments support` when using helper function (`Pull #6`).
+
+* Added `Object each operation support`.

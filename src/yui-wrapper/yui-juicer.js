@@ -246,9 +246,11 @@ YUI.add('juicer',function(Y) {
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
                     var _iterate = 'i' + _counter++;
-                    return '<% for(var ' + _iterate + '=0, l' + _iterate + '=' + _name + '.length;' + _iterate + '<l' + _iterate + ';' + _iterate + '++) {' +
-                                'var ' + alias + '=' + _name + '[' + _iterate + '];' +
-                                (key ? ('var ' + key + '=' + _iterate + ';') : '') +
+                    return '<% for(var ' + _iterate + ' in ' + _name + ') {' +
+                                'if(' + _name + '.hasOwnProperty(' + _iterate + ')) {' +
+                                    'var ' + alias + '=' + _name + '[' + _iterate + '];' +
+                                    (key ? ('var ' + key + '=' + _iterate + ';') : '') +
+                                '}' +
                         ' %>';
                 })
                 .replace(juicer.settings.forend, '<% } %>')
