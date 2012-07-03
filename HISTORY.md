@@ -39,3 +39,8 @@ Juicer Change History
 * Added `arguments support` when using helper function (`Pull #6`).
 
 * Added `Object each operation support`.
+
+0.5.4
+-----
+
+* Update `whitelist` for lexicalAnalyze.
