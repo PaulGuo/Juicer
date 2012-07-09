@@ -54,6 +54,7 @@ test('id support and if-else statement', function() {
 
 test('each statement [Array]', function() {
     var result = juicer('{@each list as o, i}${o},${i};{@/each}');
+    Array.prototype.dirtyattr = function() {};
     ok(result.render({list: ['a', 'b', 'c']}) === 'a,0;b,1;c,2;', 'Passed!');
 });
 

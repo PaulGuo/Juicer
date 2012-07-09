@@ -50,3 +50,8 @@ Juicer Change History
 
 * Fixed `window` is not defined warning under expressjs.
 * Added `expressjs` wrapper, and demo.
+
+0.5.6
+-----
+
+* Fixed `Object each operation` bug.
