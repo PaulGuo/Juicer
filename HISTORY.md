@@ -44,3 +44,9 @@ Juicer Change History
 -----
 
 * Update `whitelist` for lexicalAnalyze.
+
+0.5.5
+-----
+
+* Fixed `window` is not defined warning under expressjs.
+* Added `expressjs` wrapper, and demo.

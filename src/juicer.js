@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.4-stable
+    Version: 0.5.5-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.4-stable';
+    juicer.version = '0.5.5-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -338,7 +338,7 @@
                     // avoid re-declare native function, if not do this, template 
                     // `{@if encodeURIComponent(name)}` could be throw undefined.
                     
-                    if(window && typeof(window[statement]) === 'function' && window[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
+                    if(typeof(window) !== 'undefined' && typeof(window[statement]) === 'function' && window[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
                         return $;
                     }
 
