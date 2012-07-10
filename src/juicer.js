@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.6-stable
+    Version: 0.5.7-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.6-stable';
+    juicer.version = '0.5.7-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -338,6 +338,11 @@
                     // `{@if encodeURIComponent(name)}` could be throw undefined.
                     
                     if(typeof(window) !== 'undefined' && typeof(window[statement]) === 'function' && window[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
+                        return $;
+                    }
+
+                    // compatible for node.js
+                    if(typeof(global) !== 'undefined' && typeof(global[statement]) === 'function' && global[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
                         return $;
                     }
 

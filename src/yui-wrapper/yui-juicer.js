@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.6-stable
+    Version: 0.5.7-stable
 */
 
 YUI.add('juicer',function(Y) {
@@ -100,7 +100,7 @@ YUI.add('juicer',function(Y) {
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.6-stable';
+    juicer.version = '0.5.7-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -341,6 +341,11 @@ YUI.add('juicer',function(Y) {
                         return $;
                     }
 
+                    // compatible for node.js
+                    if(typeof(global) !== 'undefined' && typeof(global[statement]) === 'function' && global[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
+                        return $;
+                    }
+
                     buffer.push(statement); // fuck ie
                 }
 
@@ -457,4 +462,4 @@ YUI.add('juicer',function(Y) {
 
     Y.juicer = juicer;
 
-},'0.5.6-stable');
+},'0.5.7-stable');

@@ -55,3 +55,8 @@ Juicer Change History
 -----
 
 * Fixed `Object each operation` bug.
+
+0.5.7
+-----
+
+* Compatible for `avoid re-declare native function` for node.js.
