@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.7-stable';
+    juicer.version = '0.5.8-stable';
     juicer.settings = {};
 
     juicer.tags = {

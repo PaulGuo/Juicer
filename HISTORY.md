@@ -60,3 +60,8 @@ Juicer Change History
 -----
 
 * Compatible for `avoid re-declare native function` for node.js.
+
+0.5.8
+-----
+
+* Fixed `varialble outer each statement environment` bug (`Issue #8`), for example: `{@each array as item}${item}{@/each}${item}`.
