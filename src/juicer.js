@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.7-stable
+    Version: 0.5.8-stable
 */
 
 (function() {
@@ -246,13 +246,14 @@
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
                     var _iterate = 'i' + _counter++;
-                    return '<% for(var ' + _iterate + ' in ' + _name + ') {' +
-                                'if(' + _name + '.hasOwnProperty(' + _iterate + ')) {' +
-                                    'var ' + alias + '=' + _name + '[' + _iterate + '];' +
-                                    (key ? ('var ' + key + '=' + _iterate + ';') : '') +
-                        ' %>';
+                    return '<% ~function() {' +
+                                'for(var ' + _iterate + ' in ' + _name + ') {' +
+                                    'if(' + _name + '.hasOwnProperty(' + _iterate + ')) {' +
+                                        'var ' + alias + '=' + _name + '[' + _iterate + '];' +
+                                        (key ? ('var ' + key + '=' + _iterate + ';') : '') +
+                            ' %>';
                 })
-                .replace(juicer.settings.forend, '<% }} %>')
+                .replace(juicer.settings.forend, '<% }}}(); %>')
 
                 // if expression
                 .replace(juicer.settings.ifstart, function($, condition) {
@@ -286,9 +287,10 @@
                 // range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
                     var _iterate = 'j' + _counter++;
-                    return '<% for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {{' +
-                                'var ' + _name + '=' + _iterate + ';' +
-                        ' %>';
+                    return '<% ~function() {' +
+                                'for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {{' +
+                                    'var ' + _name + '=' + _iterate + ';' +
+                            ' %>';
                 });
 
             // exception handling

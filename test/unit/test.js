@@ -63,6 +63,11 @@ test('each statement [Object]', function() {
     ok(result.render({list: {'k1': 'v1', 'k2': 'v2', 'k3': 'v3'}}) === 'v1,k1;v2,k2;v3,k3;', 'Passed!');
 });
 
+test('each statement, that variables outer the each environment', function() {
+    var result = juicer('{@each array as item}${item} {@/each}${item}');
+    ok(result.render({array: [1, 2], item: 'a'}) === '1 2 a', 'Passed!');
+});
+
 test('multi-layer each statement with multi-layer if statement', function() {
     var result = juicer('{@each list as item}{@each item.arr as o, i}{@if item.arr.length === 3}${o},${i};{@else}{@if o === "h"}${o},${i};{@/if}{@/if}{@/each}{@/each}');
     var data = {list: [{arr: ['a', 'b', 'c']}, {arr: ['d', 'e', 'f']}, {arr: ['g', 'h']}]};
