@@ -1,6 +1,6 @@
 <h2>Juicer 中文文档</h2>
 
-<p><strong>当前最新版本: 0.5.8-stable</strong></p>
+<p><strong>当前最新版本: 0.5.9-stable</strong></p>
 
 <p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
 除此之外，它还可以在 Node.js 环境中运行。</p>

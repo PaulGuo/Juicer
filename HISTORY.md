@@ -65,3 +65,8 @@ Juicer Change History
 -----
 
 * Fixed `varialble outer each statement environment` bug (`Issue #8`), for example: `{@each array as item}${item}{@/each}${item}`.
+
+0.5.9
+-----
+
+* avoid re-declare registered function, if not do this, template `{@if registered_func(name)}` could be throw undefined.

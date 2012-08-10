@@ -110,6 +110,24 @@ test('custom functions, but using native function without register (IE8+)', func
     ok(result.render({hello: 'world#!'}) === 'world%23!', 'Passed!');
 });
 
+test('custom functions, using registered helper function in other where like if statement', function() {
+    var result;
+    juicer.register('helperTest', function(val) {
+        return val + '.' + val;
+    });
+    result = juicer('{@if helperTest(testVal) === "abc.abc"}helperTestPassed{@/if}', {testVal: 'abc'});
+    ok(result === 'helperTestPassed', 'Passed!');
+});
+
+test('custom functions, using registered helper function in other where like each statement', function() {
+    var result;
+    juicer.register('helperTest2', function(val) {
+        return val.split(',');
+    });
+    result = juicer('{@each helperTest2(testString) as item, index}${item}${index},{@/each}', {testString: 'value1,value2,value3'});
+    ok(result === 'value10,value21,value32,', 'Passed!');
+});
+
 test('deep lexical analyze - if', function() {
     var result = juicer('{@if a == b}${a}{@/if}{@if b < c}${c}{@/if}{@if a || d}${d}{@/if}{@if a && d}${a}{@/if}', {a: 1, b: 1, c: 2, d: 0});
     ok(result === '120', 'Passed!');

@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.8-stable
+    Version: 0.5.9-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.8-stable';
+    juicer.version = '0.5.9-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -126,7 +126,7 @@
     };
 
     juicer.tagInit = function() {
-        var forstart = juicer.tags.operationOpen + 'each\\s*([\\w\\.]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
+        var forstart = juicer.tags.operationOpen + 'each\\s*([^}]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
         var forend = juicer.tags.operationOpen + '\\/each' + juicer.tags.operationClose;
         var ifstart = juicer.tags.operationOpen + 'if\\s*([^}]*?)' + juicer.tags.operationClose;
         var ifend = juicer.tags.operationOpen + '\\/if' + juicer.tags.operationClose;
@@ -308,6 +308,7 @@
 
         this.__lexicalAnalyze = function(tpl) {
             var buffer = [];
+            var method = [];
             var prefix = '';
             var reserved = [
                 'if', 'each', '_', '_method', 'console', 
@@ -348,6 +349,14 @@
                         return $;
                     }
 
+                    // avoid re-declare registered function, if not do this, template 
+                    // `{@if registered_func(name)}` could be throw undefined.
+
+                    if(typeof(juicer.options._method[statement]) === 'function') {
+                        method.push(statement);
+                        return $;
+                    }
+
                     buffer.push(statement); // fuck ie
                 }
 
@@ -362,6 +371,10 @@
 
             for(var i = 0;i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
+            }
+
+            for(var i = 0;i < method.length; i++) {
+                prefix += 'var ' + method[i] + '=_method.' + method[i] + ';';
             }
 
             return '<% ' + prefix + ' %>';
