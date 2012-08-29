@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.6-stable
+    Version: 0.6.0-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.6-stable';
+    juicer.version = '0.6.0-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -122,11 +122,11 @@
         _method: __creator({
             __escapehtml: __escapehtml,
             __throw: __throw
-        }, this)
+        }, {})
     };
 
     juicer.tagInit = function() {
-        var forstart = juicer.tags.operationOpen + 'each\\s*([\\w\\.]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
+        var forstart = juicer.tags.operationOpen + 'each\\s*([^}]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
         var forend = juicer.tags.operationOpen + '\\/each' + juicer.tags.operationClose;
         var ifstart = juicer.tags.operationOpen + 'if\\s*([^}]*?)' + juicer.tags.operationClose;
         var ifend = juicer.tags.operationOpen + '\\/if' + juicer.tags.operationClose;
@@ -246,13 +246,14 @@
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
                     var _iterate = 'i' + _counter++;
-                    return '<% for(var ' + _iterate + ' in ' + _name + ') {' +
-                                'if(' + _name + '.hasOwnProperty(' + _iterate + ')) {' +
-                                    'var ' + alias + '=' + _name + '[' + _iterate + '];' +
-                                    (key ? ('var ' + key + '=' + _iterate + ';') : '') +
-                        ' %>';
+                    return '<% ~function() {' +
+                                'for(var ' + _iterate + ' in ' + _name + ') {' +
+                                    'if(' + _name + '.hasOwnProperty(' + _iterate + ')) {' +
+                                        'var ' + alias + '=' + _name + '[' + _iterate + '];' +
+                                        (key ? ('var ' + key + '=' + _iterate + ';') : '') +
+                            ' %>';
                 })
-                .replace(juicer.settings.forend, '<% }} %>')
+                .replace(juicer.settings.forend, '<% }}}(); %>')
 
                 // if expression
                 .replace(juicer.settings.ifstart, function($, condition) {
@@ -286,9 +287,10 @@
                 // range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
                     var _iterate = 'j' + _counter++;
-                    return '<% for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {{' +
-                                'var ' + _name + '=' + _iterate + ';' +
-                        ' %>';
+                    return '<% ~function() {' +
+                                'for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {{' +
+                                    'var ' + _name + '=' + _iterate + ';' +
+                            ' %>';
                 });
 
             // exception handling
@@ -306,6 +308,7 @@
 
         this.__lexicalAnalyze = function(tpl) {
             var buffer = [];
+            var method = [];
             var prefix = '';
             var reserved = [
                 'if', 'each', '_', '_method', 'console', 
@@ -341,6 +344,19 @@
                         return $;
                     }
 
+                    // compatible for node.js
+                    if(typeof(global) !== 'undefined' && typeof(global[statement]) === 'function' && global[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
+                        return $;
+                    }
+
+                    // avoid re-declare registered function, if not do this, template 
+                    // `{@if registered_func(name)}` could be throw undefined.
+
+                    if(typeof(juicer.options._method[statement]) === 'function') {
+                        method.push(statement);
+                        return $;
+                    }
+
                     buffer.push(statement); // fuck ie
                 }
 
@@ -355,6 +371,10 @@
 
             for(var i = 0;i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
+            }
+
+            for(var i = 0;i < method.length; i++) {
+                prefix += 'var ' + method[i] + '=_method.' + method[i] + ';';
             }
 
             return '<% ' + prefix + ' %>';
