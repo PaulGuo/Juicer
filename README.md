@@ -208,6 +208,8 @@ var html = juicer(tpl, data);
 
 <h4>在 express.js 框架中使用</h4>
 
+<p>在 express 2.x 系列版本中：</p>
+
 <pre><code>npm install juicer
 var juicer = require('juicer');
 app.set('view engine', 'html');
@@ -215,6 +217,21 @@ app.register('.html', {
     compile: function(str, options) {
         return juicer.compile(str, options).render;
     }
+});
+</code></pre>
+
+<p>在 express 3.x 系列版本中：</p>
+
+<pre><code>npm install juicer
+var juicer = require('juicer');
+var fs = require('fs');
+app.set('view engine', 'html');
+app.engine('html', function(path, options, fn){
+    fs.readFile(path, 'utf8', function(err, str){
+        if (err) return fn(err);
+        str = juicer(str, options);
+        fn(null, str);
+    });
 });
 </code></pre>
 
