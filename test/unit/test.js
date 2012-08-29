@@ -102,6 +102,9 @@ test('custom functions with register and unregister', function() {
     ok(result.render({hello: 'world'}) === '', 'Passed!');
 });
 
+/* deprecated after version >= 0.5.0
+ * ---------------------------------
+
 test('custom functions, but using native function without register (IE8+)', function() {
     var result = juicer('${hello | encodeURIComponent}');
     if(navigator.appVersion.indexOf('MSIE') != -1) {
@@ -109,6 +112,8 @@ test('custom functions, but using native function without register (IE8+)', func
     }
     ok(result.render({hello: 'world#!'}) === 'world%23!', 'Passed!');
 });
+
+*/
 
 test('custom functions, using registered helper function in other where like if statement', function() {
     var result;
@@ -150,6 +155,15 @@ test('support arguments when using helper function, like ${vo.key | fn, arg1, ag
     });
     result = juicer('${argumentsTestValue | argumentsTest, 1, 2, "three"}', {argumentsTestValue: 'argumentsTestValue&'});
     ok(result === 'argumentsTestValue&amp;.12three', 'Passed!');
+});
+
+test('test for issue #9 (bug for Firefox 14.0.1, https://bugzilla.mozilla.org/show_bug.cgi?id=785822)', function() {
+    var result;
+    var tmpl = ['<a href="#${id}" class="group-name">',
+        '<span></span><span class="count">(${memberIds.length})</span>',
+    '</a>'].join('');
+    result = juicer(tmpl);
+    ok(typeof(result) !== 'undefined', 'Passed!');
 });
 
 test('custom tag for if-else and interpolate', function() {

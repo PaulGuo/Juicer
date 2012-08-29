@@ -70,3 +70,8 @@ Juicer Change History
 -----
 
 * avoid re-declare registered function, if not do this, template `{@if registered_func(name)}` could be throw undefined.
+
+0.6.0
+-----
+
+* fixed bug for Firefox 14.0.1 (`issue #9`, https://bugzilla.mozilla.org/show_bug.cgi?id=785822), added adapter for expressjs-3.x.

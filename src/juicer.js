@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.9-stable
+    Version: 0.6.0-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.9-stable';
+    juicer.version = '0.6.0-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -122,7 +122,7 @@
         _method: __creator({
             __escapehtml: __escapehtml,
             __throw: __throw
-        }, this)
+        }, {})
     };
 
     juicer.tagInit = function() {
