@@ -9,6 +9,6 @@ exports.compile = function(str, options) {
  *
  * var juicer = require('express-juicer');
  * app.set('view engine', 'html');
- * app.engine('html', juicer);
+ * app.register('.html', juicer);
  *
  * */
