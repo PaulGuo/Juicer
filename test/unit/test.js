@@ -163,7 +163,7 @@ test('test for issue #9 (bug for Firefox 14.0.1, https://bugzilla.mozilla.org/sh
         '<span></span><span class="count">(${memberIds.length})</span>',
     '</a>'].join('');
     result = juicer(tmpl);
-    ok(typeof(result) !== 'undefined', 'Passed!');
+    ok(typeof(result._render) !== 'undefined', 'Passed!');
 });
 
 test('custom tag for if-else and interpolate', function() {
