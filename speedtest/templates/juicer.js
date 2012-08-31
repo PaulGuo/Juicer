@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.5.1-stable
+    Version: 0.6.1-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.5.1-stable';
+    juicer.version = '0.6.1-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -122,11 +122,11 @@
         _method: __creator({
             __escapehtml: __escapehtml,
             __throw: __throw
-        }, this)
+        }, {})
     };
 
     juicer.tagInit = function() {
-        var forstart = juicer.tags.operationOpen + 'each\\s*([\\w\\.]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
+        var forstart = juicer.tags.operationOpen + 'each\\s*([^}]*?)\\s*as\\s*(\\w*?)\\s*(,\\s*\\w*?)?' + juicer.tags.operationClose;
         var forend = juicer.tags.operationOpen + '\\/each' + juicer.tags.operationClose;
         var ifstart = juicer.tags.operationOpen + 'if\\s*([^}]*?)' + juicer.tags.operationClose;
         var ifend = juicer.tags.operationOpen + '\\/if' + juicer.tags.operationClose;
@@ -222,18 +222,17 @@
         this.options = options;
 
         this.__interpolate = function(_name, _escape, options) {
-            var _define = _name.split('|'), _fn = '';
+            var _define = _name.split('|'), _fn = _define[0] || '', _cluster;
 
             if(_define.length > 1) {
                 _name = _define.shift();
-                _fn = '_method.' + _define.shift();
+                _cluster = _define.shift().split(',');
+                _fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
             }
 
             return '<%= ' + (_escape ? '_method.__escapehtml.escaping' : '') + '(' +
                         (!options || options.detection !== false ? '_method.__escapehtml.detection' : '') + '(' +
-                            _fn + '(' +
-                                _name +
-                            ')' +
+                            _fn +
                         ')' +
                     ')' +
                 ' %>';
@@ -247,12 +246,14 @@
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
                     var _iterate = 'i' + _counter++;
-                    return '<% for(var ' + _iterate + '=0, l' + _iterate + '=' + _name + '.length;' + _iterate + '<l' + _iterate + ';' + _iterate + '++) {' +
-                                'var ' + alias + '=' + _name + '[' + _iterate + '];' +
-                                (key ? ('var ' + key + '=' + _iterate + ';') : '') +
-                        ' %>';
+                    return '<% ~function() {' +
+                                'for(var ' + _iterate + ' in ' + _name + ') {' +
+                                    'if(' + _name + '.hasOwnProperty(' + _iterate + ')) {' +
+                                        'var ' + alias + '=' + _name + '[' + _iterate + '];' +
+                                        (key ? ('var ' + key + '=' + _iterate + ';') : '') +
+                            ' %>';
                 })
-                .replace(juicer.settings.forend, '<% } %>')
+                .replace(juicer.settings.forend, '<% }}}(); %>')
 
                 // if expression
                 .replace(juicer.settings.ifstart, function($, condition) {
@@ -286,9 +287,10 @@
                 // range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
                     var _iterate = 'j' + _counter++;
-                    return '<% for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {' +
-                                'var ' + _name + '=' + _iterate + ';' +
-                        ' %>';
+                    return '<% ~function() {' +
+                                'for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {{' +
+                                    'var ' + _name + '=' + _iterate + ';' +
+                            ' %>';
                 });
 
             // exception handling
@@ -306,14 +308,16 @@
 
         this.__lexicalAnalyze = function(tpl) {
             var buffer = [];
+            var method = [];
             var prefix = '';
             var reserved = [
-                'if', 'each', 
+                'if', 'each', '_', '_method', 'console', 
                 'break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 
                 'finally', 'for', 'function', 'in', 'instanceof', 'new', 'return', 'switch', 
                 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'null', 'typeof', 
                 'class', 'enum', 'export', 'extends', 'import', 'super', 'implements', 'interface', 
-                'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'const', 'arguments'
+                'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'const', 'arguments', 
+                'true', 'false', 'undefined', 'NaN'
             ];
 
             var indexOf = function(array, item) {
@@ -331,7 +335,28 @@
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
                 
-                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1) {
+                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1 && indexOf(method, statement) === -1) {
+                    
+                    // avoid re-declare native function, if not do this, template 
+                    // `{@if encodeURIComponent(name)}` could be throw undefined.
+                    
+                    if(typeof(window) !== 'undefined' && typeof(window[statement]) === 'function' && window[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
+                        return $;
+                    }
+
+                    // compatible for node.js
+                    if(typeof(global) !== 'undefined' && typeof(global[statement]) === 'function' && global[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
+                        return $;
+                    }
+
+                    // avoid re-declare registered function, if not do this, template 
+                    // `{@if registered_func(name)}` could be throw undefined.
+
+                    if(typeof(juicer.options._method[statement]) === 'function') {
+                        method.push(statement);
+                        return $;
+                    }
+
                     buffer.push(statement); // fuck ie
                 }
 
@@ -341,10 +366,15 @@
             tpl.replace(juicer.settings.forstart, variableAnalyze).
                 replace(juicer.settings.interpolate, variableAnalyze).
                 replace(juicer.settings.ifstart, variableAnalyze).
+                replace(juicer.settings.elseifstart, variableAnalyze).
                 replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)]\s*([A-Za-z_]+)/igm, variableAnalyze);
 
             for(var i = 0;i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
+            }
+
+            for(var i = 0;i < method.length; i++) {
+                prefix += 'var ' + method[i] + '=_method.' + method[i] + ';';
             }
 
             return '<% ' + prefix + ' %>';
