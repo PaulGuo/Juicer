@@ -75,3 +75,8 @@ Juicer Change History
 -----
 
 * fixed bug for Firefox 14.0.1 (`issue #9`, https://bugzilla.mozilla.org/show_bug.cgi?id=785822), added adapter for expressjs-3.x.
+
+0.6.1
+-----
+
+* avoid re-analyze method statement variable.

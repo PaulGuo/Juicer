@@ -100,7 +100,7 @@ YUI.add('juicer', function(Y) {
     };
 
     juicer.__cache = {};
-    juicer.version = '0.6.0-stable';
+    juicer.version = '0.6.1-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -335,7 +335,7 @@ YUI.add('juicer', function(Y) {
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
                 
-                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1) {
+                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1 && indexOf(method, statement) === -1) {
                     
                     // avoid re-declare native function, if not do this, template 
                     // `{@if encodeURIComponent(name)}` could be throw undefined.
@@ -477,4 +477,4 @@ YUI.add('juicer', function(Y) {
 
     Y.juicer = juicer;
 
-}, '0.6.0-stable');
+}, '0.6.1-stable');

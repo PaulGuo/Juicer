@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.0-stable
+    Version: 0.6.1-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.6.0-stable';
+    juicer.version = '0.6.1-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -335,7 +335,7 @@
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
                 
-                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1) {
+                if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1 && indexOf(method, statement) === -1) {
                     
                     // avoid re-declare native function, if not do this, template 
                     // `{@if encodeURIComponent(name)}` could be throw undefined.

@@ -1,6 +1,6 @@
 <h2>Juicer 中文文档</h2>
 
-<p><strong>当前最新版本: 0.6.0-stable</strong></p>
+<p><strong>当前最新版本: 0.6.1-stable</strong></p>
 
 <p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
 除此之外，它还可以在 Node.js 环境中运行。</p>
@@ -111,7 +111,7 @@ ${name|function}
 
 var tpl = [
     '{@each links as item}',
-        '${item|links} &lt;br /&gt;',
+        '${item|links_build} &lt;br /&gt;',
     '{@/each}'
 ].join('');
 
@@ -119,7 +119,7 @@ var links = function(data) {
 	return '&lt;a href="' + data.href + '" alt="' + data.alt + '" /&gt;';
 };
 
-juicer.register('links', links); //注册自定义函数
+juicer.register('links_build', links); //注册自定义函数
 juicer(tpl, json);
 </code></pre>
 
