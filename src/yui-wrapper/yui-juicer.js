@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.0-stable
+    Version: 0.6.1-stable
 */
 
 YUI.add('juicer', function(Y) {
