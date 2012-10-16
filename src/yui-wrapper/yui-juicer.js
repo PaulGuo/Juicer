@@ -375,6 +375,7 @@ YUI.add('juicer', function(Y) {
                 replace(juicer.settings.interpolate, variableAnalyze).
                 replace(juicer.settings.ifstart, variableAnalyze).
                 replace(juicer.settings.elseifstart, variableAnalyze).
+                replace(juicer.settings.include, variableAnalyze).
                 replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)]\s*([A-Za-z_]+)/igm, variableAnalyze);
 
             for(var i = 0;i < buffer.length; i++) {
