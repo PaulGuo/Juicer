@@ -1,6 +1,6 @@
 <h2>Juicer 中文文档</h2>
 
-<p><strong>当前最新版本: 0.6.1-stable</strong></p>
+<p><strong>当前最新版本: 0.6.2-stable</strong></p>
 
 <p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
 除此之外，它还可以在 Node.js 环境中运行。</p>
@@ -190,9 +190,43 @@ juicer(unescape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
 
 <p>辅助循环是 Juicer 为你精心设置的一个语法糖，也许你会在某种情境下需要它.</p>
 
-<pre><code>{each i in range(5, 10)}
+<pre><code>{@each i in range(5, 10)}
     ${i}; //输出 5;6;7;8;9;
 {@/each}
+</code></pre>
+
+<h4>f. 子模板嵌套 {@include tpl, data}</h4>
+
+<p>子模板嵌套可以让你更灵活的组织你的模板代码，除了可以引入在数据中指定的子模板外，当然你也可以通过指定字符串`#id`使用写在`script`标签中的模板代码.</p>
+
+HTML代码：
+
+<pre><code>&lt;script type="text/juicer" id="subTpl"&gt;
+	I'm sub content, ${name}
+&lt;/script&gt;
+</code></pre>
+
+Javascript 代码：
+
+<pre><code>var tpl = 'Hi, {@include "#subTpl", subData}, End.';
+
+juicer(tpl, {
+	subData: {
+		name: 'juicer'
+	}
+});
+
+//输出 Hi, I'm sub content, juicer, End.
+//或者通过数据引入子模板，下述代码也将会有相同的渲染结果：
+
+var tpl = 'Hi, {@include subTpl, subData}, End.';
+
+juicer(tpl, {
+    subTpl: "I'm sub content, ${name}",
+    subData: {
+        name: 'juicer'
+    }
+});
 </code></pre>
 
 <a name="!node.js"></a>
