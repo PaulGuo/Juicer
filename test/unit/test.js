@@ -166,6 +166,30 @@ test('test for issue #9 (bug for Firefox 14.0.1, https://bugzilla.mozilla.org/sh
     ok(typeof(result._render) !== 'undefined', 'Passed!');
 });
 
+test('test for issue #16 (bug for variable in range expression)', function() {
+    var result;
+    var tmpl = '{@each i in range(5, end)}${i}{@/each}';
+    result = juicer(tmpl, {end: 10});
+    ok(result === '56789', 'Passed!');
+});
+
+test('test for sub-template include (`#id` as tpl, fetch tpl from script)', function() {
+    var result;
+    var tmpl = 'Hi, {@include "#juicer-sub-tmpl", subData}.';
+    result = juicer(tmpl, {subData: {time: '2012-10-12'}});
+    ok(result === 'Hi, 2012-10-12.', 'Passed!');
+});
+
+test('test for sub-template include (get tpl from given data)', function() {
+    var result;
+    var tmpl = 'Hi, {@include subTmpl, subData}.';
+    result = juicer(tmpl, {
+        subTmpl: '${time}',
+        subData: {time: '2012-10-12'}
+    });
+    ok(result === 'Hi, 2012-10-12.', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',
