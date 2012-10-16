@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.1-stable
+    Version: 0.6.2-stable
 */
 
 (function() {
@@ -100,7 +100,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.6.1-stable';
+    juicer.version = '0.6.2-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -121,7 +121,8 @@
         detection: true,
         _method: __creator({
             __escapehtml: __escapehtml,
-            __throw: __throw
+            __throw: __throw,
+            __juicer: juicer
         }, {})
     };
 
@@ -135,7 +136,8 @@
         var interpolate = juicer.tags.interpolateOpen + '([\\s\\S]+?)' + juicer.tags.interpolateClose;
         var noneencode = juicer.tags.noneencodeOpen + '([\\s\\S]+?)' + juicer.tags.noneencodeClose;
         var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
-        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\((\\d+?)\\s*,\\s*(\\d+?)\\)' + juicer.tags.operationClose;
+        var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\(([^}]+?)\\s*,\\s*([^}]+?)\\)' + juicer.tags.operationClose;
+        var include = juicer.tags.operationOpen + 'include\\s*([^}]*?)\\s*,\\s*([^}]*?)' + juicer.tags.operationClose;
 
         juicer.settings.forstart = new RegExp(forstart, 'igm');
         juicer.settings.forend = new RegExp(forend, 'igm');
@@ -147,6 +149,7 @@
         juicer.settings.noneencode = new RegExp(noneencode, 'igm');
         juicer.settings.inlinecomment = new RegExp(inlinecomment, 'igm');
         juicer.settings.rangestart = new RegExp(rangestart, 'igm');
+        juicer.settings.include = new RegExp(include, 'igm');
     };
 
     juicer.tagInit();
@@ -291,6 +294,11 @@
                                 'for(var ' + _iterate + '=' + start + ';' + _iterate + '<' + end + ';' + _iterate + '++) {{' +
                                     'var ' + _name + '=' + _iterate + ';' +
                             ' %>';
+                })
+
+                // include sub-template
+                .replace(juicer.settings.include, function($, tpl, data) {
+                    return '<%= _method.__juicer(' + tpl + ', ' + data + '); %>';
                 });
 
             // exception handling
@@ -367,6 +375,7 @@
                 replace(juicer.settings.interpolate, variableAnalyze).
                 replace(juicer.settings.ifstart, variableAnalyze).
                 replace(juicer.settings.elseifstart, variableAnalyze).
+                replace(juicer.settings.include, variableAnalyze).
                 replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)]\s*([A-Za-z_]+)/igm, variableAnalyze);
 
             for(var i = 0;i < buffer.length; i++) {
