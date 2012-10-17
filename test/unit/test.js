@@ -177,7 +177,7 @@ test('test for sub-template include (`#id` as tpl, fetch tpl from script)', func
     var result;
     var tmpl = 'Hi, {@include "#juicer-sub-tmpl", subData}.';
     result = juicer(tmpl, {subData: {time: '2012-10-12'}});
-    ok(result === 'Hi, 2012-10-12.', 'Passed!');
+    ok(result.replace(/\s+/igm, '') === 'Hi,2012-10-12.', 'Passed!');
 });
 
 test('test for sub-template include (get tpl from given data)', function() {
@@ -187,7 +187,7 @@ test('test for sub-template include (get tpl from given data)', function() {
         subTmpl: '${time}',
         subData: {time: '2012-10-12'}
     });
-    ok(result.replace(/\s+/igm, '') === 'Hi,2012-10-12.', 'Passed!');
+    ok(result === 'Hi, 2012-10-12.', 'Passed!');
 });
 
 test('custom tag for if-else and interpolate', function() {
