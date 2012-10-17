@@ -1,6 +1,6 @@
 <h2>Juicer 中文文档</h2>
 
-<p><strong>当前最新版本: 0.6.2-stable</strong></p>
+<p><strong>当前最新版本: 0.6.3-stable</strong></p>
 
 <p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
 除此之外，它还可以在 Node.js 环境中运行。</p>
@@ -267,6 +267,15 @@ app.engine('html', function(path, options, fn){
         fn(null, str);
     });
 });
+</code></pre>
+
+<p>在命令行预编译模板文件：</p>
+
+<pre><code>npm install -g juicer
+juicer example.juicer.tmpl -f example.js
+
+// type `juicer` after install for more help.
+// 全局模式安装 `juicer` 后，在命令行下输入 `juicer` 可以获得更多帮助信息。
 </code></pre>
 
 <a name="!demo"></a>

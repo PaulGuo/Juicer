@@ -87,3 +87,9 @@ Juicer Change History
 
 * fixed bug that variable support in `each .. range` expression (`issue #16`).
 * added sub-template support using `{@include sub, data}`.
+
+0.6.3
+-----
+
+* update testcase of sub-template support.
+* added command line support for node.js, using for precompile the template files, `npm install -g juicer`.

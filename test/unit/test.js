@@ -187,7 +187,7 @@ test('test for sub-template include (get tpl from given data)', function() {
         subTmpl: '${time}',
         subData: {time: '2012-10-12'}
     });
-    ok(result === 'Hi, 2012-10-12.', 'Passed!');
+    ok(result.replace(/\s+/igm, '') === 'Hi,2012-10-12.', 'Passed!');
 });
 
 test('custom tag for if-else and interpolate', function() {

@@ -9,5 +9,12 @@
 		"type": "git",
 		"url": "git@github.com:PaulGuo/Juicer.git"
 	},
-	"main": "./src/juicer"
+	"main": "./src/juicer",
+    "engines": {
+        "node": ">=0.4.7"
+    },
+    "dependencies": {
+        "optimist": "~0.3",
+        "uglify-js": "~1.2"
+    }
 }
