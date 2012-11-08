@@ -93,3 +93,8 @@ Juicer Change History
 
 * update testcase of sub-template support.
 * added command line support for node.js, using for precompile the template files, `npm install -g juicer`.
+
+0.6.4
+-----
+
+* fixed bug that `if(console)` detection will throw error under some browser (like ie6).
