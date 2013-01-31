@@ -190,6 +190,18 @@ test('test for sub-template include (get tpl from given data)', function() {
     ok(result === 'Hi, 2012-10-12.', 'Passed!');
 });
 
+test('test for helper object support', function() {
+    var result;
+    var tmpl = '${benben.inc(num)}';
+    juicer.register('benben', {
+        inc: function(num) {
+            return num + 1;
+        }
+    });
+    result = juicer(tmpl, {num: 1});
+    ok(result === '2', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',

@@ -1,6 +1,6 @@
 <h2>Juicer 中文文档</h2>
 
-<p><strong>当前最新版本: 0.6.4-stable</strong></p>
+<p><strong>当前最新版本: 0.6.5-stable</strong></p>
 
 <p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
 除此之外，它还可以在 Node.js 环境中运行。</p>
@@ -92,11 +92,11 @@ juicer.set('cache',false);
 
 <h4>a. ${变量}</h4>
 
-<p>使用 ${} 输出变量值，支持自定义函数（通过自定义函数你可以实现很多有趣的功能，类似 ${data|links} 就可以
-通过事先定义的自定义函数 links 直接对 data 拼装出&lt;a href=".." alt=".." /&gt; ）.</p>
+<p>使用 ${} 输出变量值，其中_为对数据源的引用（如${_}，常用于数据源为数组的情况）。支持自定义函数（通过自定义函数你可以实现很多有趣的功能，类似 ${data|links} 就可以通过事先定义的自定义函数 links 直接对 data 拼装出&lt;a href=".." alt=".." /&gt; ）.</p>
 
 <pre><code>${name}
 ${name|function}
+${name|function, arg1, arg2}
 </code></pre>
 
 <p>让我们通过一个例子演示一下自定义函数的奇妙用法吧.</p>

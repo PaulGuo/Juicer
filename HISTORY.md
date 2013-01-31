@@ -98,3 +98,8 @@ Juicer Change History
 -----
 
 * fixed bug that `if(console)` detection will throw error under some browser (like ie6).
+
+0.6.5
+-----
+
+* added `other helper types support`, not only the function type, but also can be object type, etc.

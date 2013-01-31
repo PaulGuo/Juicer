@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.4-stable
+    Version: 0.6.5-stable
 */
 
 YUI.add('juicer', function(Y) {
@@ -100,7 +100,7 @@ YUI.add('juicer', function(Y) {
     };
 
     juicer.__cache = {};
-    juicer.version = '0.6.4-stable';
+    juicer.version = '0.6.5-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -360,7 +360,7 @@ YUI.add('juicer', function(Y) {
                     // avoid re-declare registered function, if not do this, template 
                     // `{@if registered_func(name)}` could be throw undefined.
 
-                    if(typeof(juicer.options._method[statement]) === 'function') {
+                    if(typeof(juicer.options._method[statement]) === 'function' || juicer.options._method.hasOwnProperty(statement)) {
                         method.push(statement);
                         return $;
                     }
