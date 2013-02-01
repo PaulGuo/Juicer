@@ -202,6 +202,13 @@ test('test for helper object support', function() {
     ok(result === '2', 'Passed!');
 });
 
+test('test for object[variable] variable analyze', function() {
+    var result;
+    var tmpl = '${data.name}, ${data[name]}.';
+    result = juicer(tmpl, {data: {name: 'guokai', dier: 'dierbaby'}, name: 'dier'});
+    ok(result === 'guokai, dierbaby.', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',
