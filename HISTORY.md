@@ -102,4 +102,4 @@ Juicer Change History
 0.6.5
 -----
 
-* added `other helper types support`, not only the function type, but also can be object type, etc.
+* added `other helper types support`, not only the function type, but also can be object type, etc. fixed `variableAnalyze` for `object[variable]` statement.

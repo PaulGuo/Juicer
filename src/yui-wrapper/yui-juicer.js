@@ -376,7 +376,7 @@ YUI.add('juicer', function(Y) {
                 replace(juicer.settings.ifstart, variableAnalyze).
                 replace(juicer.settings.elseifstart, variableAnalyze).
                 replace(juicer.settings.include, variableAnalyze).
-                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)]\s*([A-Za-z_]+)/igm, variableAnalyze);
+                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)\[\]]\s*([A-Za-z_]+)/igm, variableAnalyze);
 
             for(var i = 0;i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
@@ -486,4 +486,4 @@ YUI.add('juicer', function(Y) {
 
     Y.juicer = juicer;
 
-}, '0.6.4-stable');
+}, '0.6.5-stable');
