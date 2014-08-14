@@ -28,9 +28,10 @@
         };
 
         var tpl=[
-            '<strong>',
-                '${text|foo,2,3|bar,4,5|baz,6,7}',
-            '</strong>',
+            '<pre>',
+                '${text|foo,"foo"|bar,"bar"|baz,"baz"}',
+            '</pre>',
+            '<hr>',
             '<ul>',
                 '{@each list as it, k}',
                     '<li>${it.name} (index: ${k})</li>',
@@ -61,16 +62,34 @@
         juicer.set('detection',false);
 
         // 测试多函数连续调用
-        var foo = function(text) {
-            return "<foo>" + text + "</foo>";
+        var foo = function(text, id) {
+            return [
+                '<div id="',
+                    id,
+                '">',
+                text,
+                '</div>'
+                ].join("");
         };
 
-        var bar = function(text) {
-           return "<bar>" + text + "</bar>";
+        var bar = function(text, id) {
+            return [
+                '<div id="',
+                    id,
+                '">',
+                text,
+                '</div>'
+                ].join("");
         };
 
-        var baz = function(text) {
-            return "<baz>" + text + "</baz>";
+        var baz = function(text, id) {
+            return [
+                '<div id="',
+                    id,
+                '">',
+                text,
+                '</div>'
+                ].join("");
         };
 
         juicer.register("foo", foo);
