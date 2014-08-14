@@ -227,8 +227,15 @@
         this.__interpolate = function(_name, _escape, options) {
             var _define = _name.split('|'), _fn = _define[0] || '', _cluster;
 
+            // 现在的问题就是 将 "text|func, arg1, arg2|func2 ,arg1, arg2" 这样的字符
+            // 串编译成函数的顺序调用
+
             if(_define.length > 1) {
+                // 原本的参数
                 _name = _define.shift();
+
+                // 对于两个函数的情况 似乎需要使用 cps 变换
+                // 将多个函数嵌套起来调用
                 _cluster = _define.shift().split(',');
                 _fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
             }
@@ -285,7 +292,7 @@
                 })
 
                 // clean up comments
-                .replace(juicer.settings.inlinecomment, '')
+                tpl.replace(juicer.settings.inlinecomment, '')
 
                 // range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
