@@ -227,11 +227,7 @@
         this.__interpolate = function(_name, _escape, options) {
             var _define = _name.split('|'), _fn = _define[0] || '', _cluster;
 
-            // 现在的问题就是 将 "text|func, arg1, arg2|func2 ,arg1, arg2" 这样的字符
-            // 串编译成函数的顺序调用
-
             if(_define.length > 1) {
-                // 取出原始参数, _define 余下的部分都是函数描述
                 _name = _define.shift();
 
                 var makeFnString = function(_name, _cluster) {
@@ -245,9 +241,6 @@
                     }
                     _fns = makeFnString(_name, _define[i].split(","))
                 }
-
-                //_cluster = _define.shift().split(',');
-                //_fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
 
                 _fn = _fns;
             }
