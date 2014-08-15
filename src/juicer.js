@@ -298,6 +298,8 @@
 
                 // include sub-template
                 .replace(juicer.settings.include, function($, tpl, data) {
+                    // compatible for node.js
+                    if(tpl.match(/^file\:\/\//igm)) return $;
                     return '<%= _method.__juicer(' + tpl + ', ' + data + '); %>';
                 });
 

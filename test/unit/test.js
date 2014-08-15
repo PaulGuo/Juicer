@@ -209,6 +209,11 @@ test('test for object[variable] variable analyze', function() {
     ok(result === 'guokai, dierbaby.', 'Passed!');
 });
 
+test('include tag compatible for node.js', function() {
+    var result = juicer('{@include file://./index.juicer}', {});
+    ok(result === '{@include file://./index.juicer}', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',

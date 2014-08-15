@@ -103,3 +103,7 @@ Juicer Change History
 -----
 
 * added `other helper types support`, not only the function type, but also can be object type, etc. fixed `variableAnalyze` for `object[variable]` statement.
+
+0.6.6
+-----
+* added `include tag compatible for node.js`, now you can use `{@include file://./index.tpl}` to include sub-template files in node.js, `include` tag without the quotes will be passed.
