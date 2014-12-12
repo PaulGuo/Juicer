@@ -9,7 +9,7 @@
 	<script id="tpl" type="text/template">
         <ul>
             {@each list as it,index}
-                <li>${index}:<a href="s?wd=${:it.corp}">${it.name}</a></li>
+                <li>${index}:<a href="s?wd=${:it.corp}">${it.name|limitlen:6:"..."}</a></li>
             {@/each}
             {@each blah as it}
                 <li>
@@ -47,7 +47,13 @@
 	            {num: 4}
 	        ]
 	    };
-
+	    // 注册自定义函数
+	    juicer.register('limitlen', function(str, len, dot) {
+	        if (str.length > len) {
+	            return str.substring(0, len) + dot;
+	        }
+	        return str;
+	    });
 		var tpl = document.getElementById('tpl').innerHTML;
 
 		var inc=function(n) {
@@ -61,7 +67,7 @@
 		juicer.set('strip',true);
 		juicer.set('detection',false);
 
-		for(var i=0;i<5000;i++) {
+		for(var i=0;i<1000;i++) {
 			juicer(tpl,data);
 		}
 
@@ -69,7 +75,7 @@
 		var exhausttime=endtimestamp-starttimestamp;
 
 		document.write(juicer(tpl,data));
-		document.write('渲染5000次: '+exhausttime + '毫秒');
+		document.write('渲染1000次: '+exhausttime + '毫秒');
 
 		console.log(juicer(tpl).render.toString());
 		console.log(exhausttime);
