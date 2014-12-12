@@ -59,11 +59,18 @@
         raw: function (str) {
             return str;
         },
+        trim: function (str) {
+            return (str + '').replace(/(^\s*)|(\s*$)/g, '');
+        },
         escapeurl: function (str) {
             return encodeURIComponent(str);
         },
         detection: function(data) {
-            return typeof(data) === 'undefined' ? '' : data;
+            if(data === null || data === undefined) {
+                return '';
+            } else {
+                return data + '';
+            }
         }
     };
     
@@ -126,6 +133,7 @@
         errorhandling: true,
         loose: true,
         detection: true,
+        trim: true,
         encode: true,
         _method: __creator({
             __escapehtml: __escapehtml,
@@ -141,7 +149,7 @@
         var ifend = juicer.tags.operationOpen + '\\/if' + juicer.tags.operationClose;
         var elsestart = juicer.tags.operationOpen + 'else' + juicer.tags.operationClose;
         var elseifstart = juicer.tags.operationOpen + 'else if\\s*([^}]*?)' + juicer.tags.operationClose;
-        var interpolate = juicer.tags.interpolateOpen + '((=|:)?([\\s\\S]+?))' + juicer.tags.interpolateClose;
+        var interpolate = juicer.tags.interpolateOpen + '((=|:|)([\\s\\S]+?))' + juicer.tags.interpolateClose;
         var noneencode = juicer.tags.noneencodeOpen + '([\\s\\S]+?)' + juicer.tags.noneencodeClose;
         var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
         var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\(([^}]+?)\\s*,\\s*([^}]+?)\\)' + juicer.tags.operationClose;
@@ -233,7 +241,7 @@
         this.options = options;
 
         this.__interpolate = function(_name, _flag, options) {
-            var _define = _name.split('|'), _fn = _define[0] || '', _cluster;
+            var _define = _name.split('|'), _fn = _define[0] || '', _cluster, _source;
             var _decorate = {
                 ':': 'escapeurl',
                 '=': 'raw'
@@ -245,12 +253,15 @@
                 _fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
             }
 
+            if(!options || options.detection !== false) {
+                _fn = '_method.__escapehtml.detection(' + _fn + ')';
+            }
+
             return '<%= _method.__escapehtml.' + _decorate + '(' +
-                        (!options || options.detection !== false ? '_method.__escapehtml.detection' : '') + '(' +
+                        (!options || options.trim !== false ? '_method.__escapehtml.trim' : '') + '(' +
                             _fn +
                         ')' +
-                    ')' +
-                ' %>';
+                    ') %>';
         };
 
         this.__removeShell = function(tpl, options) {
@@ -260,14 +271,14 @@
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
                     var _iterate = 'i' + _counter++;
-                    return '<%(function() {' +
+                    return '<%~function() {' +
                                 'for(var ' + _iterate + ' in ' + _name + ') {' +
                                     'if(' + _name + '.hasOwnProperty(' + _iterate + ')) {' +
                                         'var ' + alias + '=' + _name + '[' + _iterate + '];' +
                                         (key ? ('var ' + key + '=' + _iterate + ';') : '') +
                             ' %>';
                 })
-                .replace(juicer.settings.forend, '<% }}})();%>')
+                .replace(juicer.settings.forend, '<% }}}();%>')
 
                 // if expression
                 .replace(juicer.settings.ifstart, function($, condition) {
@@ -287,7 +298,7 @@
 
                 // interpolate without escape
                 .replace(juicer.settings.noneencode, function($, _name) {
-                    return that.__interpolate(_name, false, options);
+                    return that.__interpolate(_name, '=', options);
                 })
 
                 // interpolate with escape
@@ -499,6 +510,16 @@
         return this.compile(tpl, options).render(data, options._method);
     };
 
-    typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
-
+    if (typeof require == 'function' && typeof module == 'object' && typeof module.exports == 'object') {
+        // [1] CommonJS/Node.js
+        module.exports = juicer;
+    } else if (typeof define == 'function' && define.amd) {
+        // [2] AMD anonymous module
+        define(function() {
+            return juicer;
+        });
+    } else {
+        // [3] browser-side, global
+        this.juicer = juicer;
+    }
 })();
