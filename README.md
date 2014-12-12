@@ -14,12 +14,17 @@ Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juic
 ### Juicer 的引入
 
 	<script type="text/javascript" src="juicer-min.js></script>
+	
+Juicer支持多种加载模式，满足 `CMD`, `AMD` 已经浏览器环境运行，可以很方便的通过 `requireJS` 或者 `esl`模块化管理。
+
+    require('./juicer', function(juicer){
+        juicer(tpl, data);
+    });
+    
 
 ## * 使用方法
 
 &gt; 编译模板并根据所给的数据立即渲染出结果.
-
-PS：
 
 	juicer(tpl, data);
 
@@ -34,8 +39,12 @@ PS：
 
 &gt; 注册/注销自定义函数（对象），在下边 ${变量} 中会有实例.
 
-	juicer.register('function_name', function);
-	juicer.unregister('function_name');
+	juicer.register('limitlen', function(string, len, dot){
+	    // 自定义函数实现
+	    return 'string';
+	});
+	juicer.unregister('helper');
+	${name|limitlen:15:"..."}
 
 &gt; 自定义模板语法边界符，下边是 Juicer 默认的边界符。你可以借此解决 Juicer 模板语法同某些后端语言模板语法冲突的情况.
 
@@ -56,6 +65,7 @@ PS：
     	cache:          true [false],  
     	strip:          true [false],  
     	errorhandling:  true [false], 
+    	trim:           true [false], 
     	loose:          true [false],
     	encode:         true [false],
     	detection:      true [false]
@@ -65,6 +75,7 @@ PS：
 
 * cache             是否缓存编译中间体，关闭可能降低性能；
 * strip             是否清除换行等无效空白
+* trim              是否清除变量前后的空格
 * encode            变量默认HTML编码 `强烈建议开启`，如果需要字面量输出建议放弃`$${name}`语法，使用 `${=name}`方式
 * errorhandling     是否自动 catch 模板错误
 * loose             是否主动提取模板用到的字段，如关闭将使用 `with(_){}` 的方式
@@ -75,8 +86,8 @@ PS：
 
 #### 逐条参数更改：
 
-	juicer.set('strip',false);
-	juicer.set('cache',false);
+	juicer.set('strip', false);
+	juicer.set('cache', false);
 
 #### 批量参数更改：
 
@@ -107,15 +118,15 @@ Juicer 默认会对编译后的模板进行缓存，从而避免同一模板多�
 
 	var json = {
         links: [
-            {url: 'http://juicer.name'},
-            {url: 'http://benben.cc'},
-            {url: 'http://ued.taobao.com'}
+            {text: "<b>juicer</b>", url: 'http://juicer.name'},
+            {text: "<b>benben.cc</b>", url: 'http://benben.cc'},
+            {text: "ued.taobao.com", url: 'http://ued.taobao.com'}
         ]
     };
-
+    
     var tpl = [
         '{@each links as item}',
-            '${item.url|limitlen:15:"..."} <br />',
+            '<a href="${item.url}">$${item.text}: ${item.url|limitlen:15:"..."}<a/><br />',
         '{@/each}'
     ].join('');
 
@@ -131,8 +142,8 @@ Juicer 默认会对编译后的模板进行缓存，从而避免同一模板多�
 
 上述代码执行后我们会发现结果是这样的：
 
-    <a href="http://juicer.name">&lt;b&gt;juicer&lt;/b&gt;: http://juicer.n...<a/><br />
-    <a href="http://benben.cc">&lt;b&gt;benben.cc&lt;/b&gt;: http://benben.c...<a/><br />
+    <a href="http://juicer.name"><b>juicer</b>: http://juicer.n...<a/><br />
+    <a href="http://benben.cc"><b>benben.cc</b>: http://benben.c...<a/><br />
     <a href="http://ued.taobao.com">ued.taobao.com: http://ued.taob...<a/><br />
 
 可以看得出，字符串被很好的截断， 同时链接文案被 HTML 转义了，如果我们上边使用 `$${item.text}` 或者 `${=item.text}` 就会得到我们预期的结果，这就是下边即将提到的`避免转义`.
@@ -276,7 +287,8 @@ __注意__：使用过程注意循环引用。
 ## * 一个完整的例子
 
 HTML 代码:
-
+    
+    {# 这里是注释内容}
     <script id="tpl" type="text/template">
         <ul>
             {@each list as it,index}
@@ -320,3 +332,6 @@ Javascript 代码:
 
     var tpl = document.getElementById('tpl').innerHTML;
     var html = juicer(tpl, data);
+
+---
+· 更多资料请访问： <http://juicer.name/>
