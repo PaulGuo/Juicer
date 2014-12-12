@@ -43,7 +43,7 @@ Juicer支持多种加载模式，满足 `CMD`, `AMD` 已经浏览器环境运行
 	    // 自定义函数实现
 	    return 'string';
 	});
-	juicer.unregister('helper');
+	juicer.unregister('limitlen');
 	${name|limitlen:15:"..."}
 
 &gt; 自定义模板语法边界符，下边是 Juicer 默认的边界符。你可以借此解决 Juicer 模板语法同某些后端语言模板语法冲突的情况.
