@@ -19,6 +19,8 @@ Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juic
 
 &gt; 编译模板并根据所给的数据立即渲染出结果.
 
+PS：
+
 	juicer(tpl, data);
 
 &gt; 仅编译模版暂不渲染，它会返回一个可重用的编译后的函数.
@@ -51,11 +53,23 @@ Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juic
 ### 默认参数配置
 
 	{
-    	cache:          true [false],
-    	strip:          true [false],
-    	errorhandling:  true [false],
+    	cache:          true [false],  
+    	strip:          true [false],  
+    	errorhandling:  true [false], 
+    	loose:          true [false],
+    	encode:         true [false],
     	detection:      true [false]
 	}
+
+参数说明：
+
+* cache             是否缓存编译中间体，关闭可能降低性能；
+* strip             是否清除换行等无效空白
+* encode            变量默认HTML编码 `强烈建议开启`，如果需要字面量输出建议放弃`$${name}`语法，使用 `${=name}`方式
+* errorhandling     是否自动 catch 模板错误
+* loose             是否主动提取模板用到的字段，如关闭将使用 `with(_){}` 的方式
+* detection         是否优化输出，例如将 `undefined`输出空字符串`''`
+
 
 默认配置是 Juicer 推荐的使用方式，如果你使用过程中的确需要更改这些参数，可以这么做：
 
@@ -80,69 +94,74 @@ Juicer 默认会对编译后的模板进行缓存，从而避免同一模板多�
 
 使用 `${}` 输出变量值，其中`_`为对数据源的引用（如`${_}`，常用于数据源为数组的情况）。支持自定义函数（通过自定义函数你可以实现很多有趣的功能，类似 `${data|links}` 就可以通过事先定义的自定义函数 links 直接对 data 拼装出`<a href=".." alt=".." />` ）.
 
-	${name}
-	${name|function}
-	${name|function, arg1, arg2}
+变量内也提供三种简单的转义：
+
+* `${=name}` 如果变量之前紧跟 `=` 原样输出不做任何转义，`安全隐患`
+* `${name}`  开启`encode`则 HTML 编码否则输出字面量
+* `${:name}` URL编码，用于 url 链接，例如 `<a href="wd=${:keyword}"` 
+* `${name|trim}` 简单修改器
+* `${name|limitlen:20:"..."}`带参数的修改器	
+	
 
 让我们通过一个例子演示一下自定义函数的奇妙用法吧.
 
 	var json = {
-		links: [
-    		{href: 'http://juicer.name', alt: 'Juicer'},
-    		{href: 'http://benben.cc', alt: 'Benben'},
-    		{href: 'http://ued.taobao.com', alt: 'Taobao UED'}
-		]
-	};
+        links: [
+            {url: 'http://juicer.name'},
+            {url: 'http://benben.cc'},
+            {url: 'http://ued.taobao.com'}
+        ]
+    };
 
-	var tpl = [
-		'{@each links as item}',
-			'${item|links_build} <br />',
-		'{@/each}'
-	].join('');
+    var tpl = [
+        '{@each links as item}',
+            '${item.url|limitlen:15:"..."} <br />',
+        '{@/each}'
+    ].join('');
 
-	var links = function(data) {
-		return '<a href="' + data.href + '" alt="' + data.alt + '" />';
-	};
+    // 注册自定义函数
+    juicer.register('limitlen', function(str, len, dot) {
+        if (str.length > len) {
+            return str.substring(0, len) + dot;
+        }
+        return str;
+    });
+    juicer(tpl, json);
 
-juicer.register('links_build', links); //注册自定义函数
-juicer(tpl, json);
-</code></pre>
 
 上述代码执行后我们会发现结果是这样的：
 
-	&lt;a href=&quot;http://juicer.name&quot; alt=&quot;Juicer&quot; <br />
-	&lt;a href=&quot;http://benben.cc&quot; alt=&quot;Benben&quot; <br />
-	&lt;a href=&quot;http://ued.taobao.com&quot; alt=&quot;Taobao UED&quot; <br />
+    <a href="http://juicer.name">&lt;b&gt;juicer&lt;/b&gt;: http://juicer.n...<a/><br />
+    <a href="http://benben.cc">&lt;b&gt;benben.cc&lt;/b&gt;: http://benben.c...<a/><br />
+    <a href="http://ued.taobao.com">ued.taobao.com: http://ued.taob...<a/><br />
 
-可以看得出，结果被转义了，如果我们上边使用 $${item|links} 就会得到我们预期的结果，这就是下边即将提到的避免转义。
+可以看得出，字符串被很好的截断， 同时链接文案被 HTML 转义了，如果我们上边使用 `$${item.text}` 或者 `${=item.text}` 就会得到我们预期的结果，这就是下边即将提到的`避免转义`.
 
 __转义/避免转义__
 
-出于安全角度的考虑，`${变量}` 在输出之前会对其内容进行转义，如果你不想输出结果被转义，可以使用 `$${变量}` 来避免这种情况。例如：
+出于安全角度的考虑，`${变量}` 在输出之前可能会对其内容进行转义（取决于 `encode` 配置项开关），如果你不想输出结果被转义，可以使用 `$${变量}` 或者使用 `${=变量}` 来避免这种情况。例如：
 
 	var json = {
-		value: '&lt;strong&gt;juicer&lt;/strong&gt;'
+		value: '<strong>juicer</strong>'
 	};
-
-	var escape_tpl='${value}';
-	var unescape_tpl='$${value}';
-
-	juicer(escape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
-	juicer(unescape_tpl, json); //输出 '<strong>juicer</strong>'
+	
+	juicer("${value}", json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
+	juicer("$${value}", json); //等价于 ${=value} 输出 '<strong>juicer</strong>'
+	
+__建议__: 统一使用 `${=name}`避免转义。
 
 #### b. 循环遍历 {@each} ... {@/each}
 
-如果你需要对数组进行循环遍历的操作，就可以像这样使用 `each` .
+如果你需要对`数组`进行循环遍历的操作，就可以像这样使用 `each` .
 
 	{@each list as item}
-		${item.prop}
+		<a href="?wd=${:item.name}">${item.name}</a>
 	{@/each}
 
 如果遍历过程中想取得当前的索引值，也很方便.
 
 	{@each list as item, index}
-		${item.prop}
-		${index} //当前索引
+	    <a data-index="${index}" href="?wd=${:item.name}">${item.name}</a>
 	{@/each}
 
 #### c. 判断 {@if} ... {@else if} ... {@else} ... {@/if}
@@ -151,9 +170,9 @@ __转义/避免转义__
 
 	{@each list as item,index}
 		{@if index===3}
-			the index is 3, the value is ${item.prop}
+			the index is 3, the value is ${=item.prop}
 		{@else if index === 4}
-			the index is 4, the value is ${item.prop}
+			the index is 4, the value is ${=item.prop}
 		{@else}
 			the index is not 3, the value is ${item.prop}
 		{@/if}
@@ -205,6 +224,9 @@ Javascript 代码：
 		}
 	});
 
+__注意__：使用过程注意循环引用。
+
+
 [](!node.js)
 ## * 在 Node.js 环境中运行
 
@@ -253,46 +275,48 @@ Javascript 代码：
 [](!demo)
 ## * 一个完整的例子
 
-	HTML 代码:
+HTML 代码:
 
-	<script id="tpl" type="text/template">
-		<ul>
-			{@each list as it,index}
-				<li>${it.name} (index: ${index})</li>
-			{@/each}
-			{@each blah as it}
-				<li>
-					num: ${it.num} <br />
-					{@if it.num==3}
-						{@each it.inner as it2}
-							${it2.time} <br />
-						{@/each}
-					{@/if}
-				</li>
-			{@/each}
-		</ul>
-	</script>
+    <script id="tpl" type="text/template">
+        <ul>
+            {@each list as it,index}
+                <li>${index}:<a href="s?wd=${:it.corp}">${it.name}</a></li>
+            {@/each}
+            {@each blah as it}
+                <li>
+                    num: ${it.num} <br />
+                    {@if it.num}
+                        {@each it.inner as ct}
+                            ${ct.time} ${=ct.task} <br />
+                        {@/each}
+                    {@/if}
+                </li>
+            {@/each}
+        </ul>
+    </script>
 
-	Javascript 代码:
+Javascript 代码:
 
 	var data = {
-		list: [
-			{name:' guokai', show: true},
-			{name:' benben', show: false},
-			{name:' dierbaby', show: true}
-		],
-		blah: [
-			{num: 1},
-			{num: 2},
-			{num: 3, inner:[
-				{'time': '15:00'},
-				{'time': '16:00'},
-				{'time': '17:00'},
-				{'time': '18:00'}
-			]},
-			{num: 4}
-		]
-	};
+        list: [
+            {name:' guokai', show: true, corp: '淘宝'},
+            {name:' benben', show: false, corp: '百度'},
+            {name:' dierbaby', show: true}
+        ],
+        blah: [
+            {num: 1},
+            {num: 2},
+            {num: 3, 
+                inner:[
+                    {'time': '15:00'},
+                    {'time': '16:00', task: "<em>提醒</em>"},
+                    {'time': '17:00'},
+                    {'time': '18:00'}
+                ]
+            },
+            {num: 4}
+        ]
+    };
 
-	var tpl = document.getElementById('tpl').innerHTML;
-	var html = juicer(tpl, data);
+    var tpl = document.getElementById('tpl').innerHTML;
+    var html = juicer(tpl, data);
