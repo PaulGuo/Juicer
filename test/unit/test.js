@@ -214,9 +214,14 @@ test('include tag compatible for node.js', function() {
     ok(result === '{@include file://./index.juicer}', 'Passed!');
 });
 
-test('inline helper register', function() {
+test('inline helper register for node.js', function() {
     var result = juicer('<!--{@helper plus}function(num) {return ++num;}{@/helper}-->${num|plus}', {num: 123});
     ok(result === '<!--{@helper plus}function(num) {return ++num;}{@/helper}-->124', 'Passed!');
+});
+
+test('inline helper register for browser', function() {
+    var result = juicer('${num|double}', {num: 123});
+    ok(result === '246', 'Passed!');
 });
 
 test('custom tag for if-else and interpolate', function() {

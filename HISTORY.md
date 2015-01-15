@@ -111,3 +111,7 @@ Juicer Change History
 0.6.7
 -----
 * added `inline helper register`, now you can use `{@helper name} .. {@/helper}` to register helper function both in node.js or browser.
+
+0.6.8
+-----
+* update `inline helper register` for browser support.
