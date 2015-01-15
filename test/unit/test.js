@@ -214,6 +214,11 @@ test('include tag compatible for node.js', function() {
     ok(result === '{@include file://./index.juicer}', 'Passed!');
 });
 
+test('inline helper register', function() {
+    var result = juicer('<!--{@helper plus}function(num) {return ++num;}{@/helper}-->${num|plus}', {num: 123});
+    ok(result === '<!--{@helper plus}function(num) {return ++num;}{@/helper}-->124', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',

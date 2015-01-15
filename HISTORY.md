@@ -107,3 +107,7 @@ Juicer Change History
 0.6.6
 -----
 * added `include tag compatible for node.js`, now you can use `{@include file://./index.tpl}` to include sub-template files in node.js, `include` tag without the quotes will be passed.
+
+0.6.7
+-----
+* added `inline helper register`, now you can use `{@helper name} .. {@/helper}` to register helper function both in node.js or browser.

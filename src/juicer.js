@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.5-stable
+    Version: 0.6.7-stable
 */
 
 (function() {
@@ -99,8 +99,42 @@
         return n;
     };
 
+    var annotate = function(fn) {
+        var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
+        var FN_ARG_SPLIT = /,/;
+        var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+        var FN_BODY = /^function[^{]+{([\s\S]*)}/m;
+        var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        var args = [],
+            fnText,
+            fnBody,
+            argDecl;
+
+        if (typeof fn === 'function') {
+            if (fn.length) {
+                fnText = fn.toString();
+            }
+        } else if(typeof fn === 'string') {
+            fnText = fn;
+        }
+
+        fnText = fnText.replace(STRIP_COMMENTS, '');
+        fnText = fnText.trim();
+        argDecl = fnText.match(FN_ARGS);
+        fnBody = fnText.match(FN_BODY)[1].trim();
+
+        for(var i = 0; i < argDecl[1].split(FN_ARG_SPLIT).length; i++) {
+            var arg = argDecl[1].split(FN_ARG_SPLIT)[i];
+            arg.replace(FN_ARG, function(all, underscore, name) {
+                args.push(name);
+            });
+        }
+
+        return [args, fnBody];
+    };
+
     juicer.__cache = {};
-    juicer.version = '0.6.5-stable';
+    juicer.version = '0.6.7-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -138,6 +172,9 @@
         var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
         var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\(([^}]+?)\\s*,\\s*([^}]+?)\\)' + juicer.tags.operationClose;
         var include = juicer.tags.operationOpen + 'include\\s*([^}]*?)\\s*,\\s*([^}]*?)' + juicer.tags.operationClose;
+        var helperRegisterStart = juicer.tags.operationOpen + 'helper\\s*([^}]*?)\\s*' + juicer.tags.operationClose;
+        var helperRegisterBody = '([\\s\\S]*?)';
+        var helperRegisterEnd = juicer.tags.operationOpen + '\\/helper' + juicer.tags.operationClose;
 
         juicer.settings.forstart = new RegExp(forstart, 'igm');
         juicer.settings.forend = new RegExp(forend, 'igm');
@@ -150,6 +187,7 @@
         juicer.settings.inlinecomment = new RegExp(inlinecomment, 'igm');
         juicer.settings.rangestart = new RegExp(rangestart, 'igm');
         juicer.settings.include = new RegExp(include, 'igm');
+        juicer.settings.helperRegister = new RegExp(helperRegisterStart + helperRegisterBody + helperRegisterEnd, 'igm');
     };
 
     juicer.tagInit();
@@ -245,6 +283,17 @@
             var _counter = 0;
 
             tpl = tpl
+                // inline helper register
+                .replace(juicer.settings.helperRegister, function($, helperName, fnText) {
+                    var anno = annotate(fnText);
+                    var fnArgs = anno[0];
+                    var fnBody = anno[1];
+                    var fn = new Function(fnArgs.join(','), fnBody);
+
+                    juicer.register(helperName, fn);
+                    return $;
+                })
+
                 // for expression
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
