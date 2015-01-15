@@ -31,11 +31,11 @@
                 args[0] = elem ? (elem.value || elem.innerHTML) : $;
             });
         }
-        
+
         if(arguments.length == 1) {
             return juicer.compile.apply(juicer, args);
         }
-        
+
         if(arguments.length >= 2) {
             return juicer.to_html.apply(juicer, args);
         }
@@ -60,7 +60,7 @@
             return typeof(data) === 'undefined' ? '' : data;
         }
     };
-    
+
     var __throw = function(error) {
         if(typeof(console) !== 'undefined') {
             if(console.warn) {
@@ -73,7 +73,7 @@
                 return;
             }
         }
-        
+
         throw(error);
     };
 
@@ -185,7 +185,7 @@
             set(conf, value);
             return;
         }
-        
+
         if(conf === Object(conf)) {
             for(var i in conf) {
                 if(conf.hasOwnProperty(i)) {
@@ -243,7 +243,7 @@
 
         this.__removeShell = function(tpl, options) {
             var _counter = 0;
-            
+
             tpl = tpl
                 // for expression
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
@@ -334,22 +334,22 @@
                 if (Array.prototype.indexOf && array.indexOf === Array.prototype.indexOf) {
                     return array.indexOf(item);
                 }
-                
+
                 for(var i=0; i < array.length; i++) {
                     if(array[i] === item) return i;
                 }
-                
+
                 return -1;
             };
 
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
-                
+
                 if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1 && indexOf(method, statement) === -1) {
-                    
+
                     // avoid re-declare native function, if not do this, template 
                     // `{@if encodeURIComponent(name)}` could be throw undefined.
-                    
+
                     if(typeof(window) !== 'undefined' && typeof(window[statement]) === 'function' && window[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
                         return $;
                     }
@@ -390,7 +390,7 @@
 
             return '<% ' + prefix + ' %>';
         };
-        
+
         this.__convert=function(tpl, strip) {
             var buffer = [].join('');
 
@@ -425,7 +425,7 @@
                     .split("<%").join("';")
                     .split("%>").join("_out+='")+
                     "';return _out.replace(/[\\r\\n]\\s+[\\r\\n]/g, '\\r\\n');";
-                    
+
             return buffer;
         };
 
@@ -435,7 +435,7 @@
             if(!options || options.loose !== false) {
                 tpl = this.__lexicalAnalyze(tpl) + tpl;
             }
-            
+
             tpl = this.__removeShell(tpl, options);
             tpl = this.__toNative(tpl, options);
 
@@ -462,16 +462,16 @@
             var engine = this.__cache[tpl] ? 
                 this.__cache[tpl] : 
                 new this.template(this.options).parse(tpl, options);
-            
+
             if(!options || options.cache !== false) {
                 this.__cache[tpl] = engine;
             }
-            
+
             return engine;
 
         } catch(e) {
             __throw('Juicer Compile Exception: ' + e.message);
-            
+
             return {
                 render: function() {} // noop
             };
