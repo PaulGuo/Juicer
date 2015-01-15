@@ -2,15 +2,21 @@ body {
 	width:800px;
 	margin:0 auto;
 	/*font-family:Georgia,'Nimbus Roman No9 L','Liberation Serif',serif;*/
-	font-family:"Lucida Sans", Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
-	line-height:1.4em;
+	/*font-family:"Lucida Sans", Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;*/
+	/*line-height:1.4em;*/
+	font-family: "Hiragino Kaku Gothic ProN", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", STHeiti;
+	line-height:1.7em;
 	background:#fff;
+	font-size: 14px;
 }
 
 pre {
 	border-left:4px solid gray;
 	padding-left:10px;
 	background:#eee;
+	line-height: 1.5em;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 pre code {

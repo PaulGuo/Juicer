@@ -7,9 +7,9 @@
 </head>
 <body>
 
-<h2>Juicer 中文文档</h2>
+<h2><i>Juicer</i> 中文文档</h2>
 
-<p><strong>当前最新版本: 0.6.5-stable</strong></p>
+<p><strong>当前最新版本: 0.6.8-stable</strong></p>
 
 <p>Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。
 除此之外，它还可以在 Node.js 环境中运行。</p>
@@ -158,7 +158,31 @@ juicer(escape_tpl, json); //输出 '&amp;lt;strong&amp;gt;juicer&amp;lt;/strong&
 juicer(unescape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
 </code></pre>
 
-<h4>b. 循环遍历 {@each} ... {@/each}</h4>
+<h4>b. 内联辅助函数 {@helper} ... {@/helper}</h4>
+
+<p>如果你需要在页面或者模板内定义辅助函数，可以像这样使用 `helper`，同时支持Node和Browser.</p>
+
+<pre><code>&lt;!--
+{@helper numberPlus}
+    function(number) {
+        return number + 1;
+    }
+{@/helper}
+--&gt;
+</code></pre>
+
+Javascript 代码：
+
+<pre><code>var tpl = 'Number: ${num|numberPlus}';
+
+juicer(tpl, {
+    num: 123
+});
+
+//输出 Number: 124
+</code></pre>
+
+<h4>c. 循环遍历 {@each} ... {@/each}</h4>
 
 <p>如果你需要对数组进行循环遍历的操作，就可以像这样使用 `each` .</p>
 
@@ -175,7 +199,7 @@ juicer(unescape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
 {@/each}
 </code></pre>
 
-<h4>c. 判断 {@if} ... {@else if} ... {@else} ... {@/if}</h4>
+<h4>d. 判断 {@if} ... {@else if} ... {@else} ... {@/if}</h4>
 
 <p>我们也会经常碰到对数据进行逻辑判断的时候.</p>
 
@@ -190,13 +214,13 @@ juicer(unescape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
 {@/each}
 </code></pre>
 
-<h4>d. 注释 {# 注释内容}</h4>
+<h4>e. 注释 {# 注释内容}</h4>
 
 <p>为了后续代码的可维护性和可读性，我们可以在模板中增加注释.</p>
 
 <pre><code>{# 这里是注释内容}</code></pre>
 
-<h4>e. 辅助循环 {@each i in range(m, n)}</h4>
+<h4>f. 辅助循环 {@each i in range(m, n)}</h4>
 
 <p>辅助循环是 Juicer 为你精心设置的一个语法糖，也许你会在某种情境下需要它.</p>
 
@@ -205,7 +229,7 @@ juicer(unescape_tpl, json); //输出 '&lt;strong&gt;juicer&lt;/strong&gt;'
 {@/each}
 </code></pre>
 
-<h4>f. 子模板嵌套 {@include tpl, data}</h4>
+<h4>g. 子模板嵌套 {@include tpl, data}</h4>
 
 <p>子模板嵌套可以让你更灵活的组织你的模板代码，除了可以引入在数据中指定的子模板外，当然你也可以通过指定字符串`#id`使用写在`script`标签中的模板代码.</p>
 
@@ -277,6 +301,11 @@ app.engine('html', function(path, options, fn){
         fn(null, str);
     });
 });
+</code></pre>
+
+<p>或者也可以借助 <i>juicer-express-adapter</i> 中间件在Node端使用Juicer以及简单的include功能。</p>
+
+<pre><code>npm install juicer-express-adapter
 </code></pre>
 
 <p>在命令行预编译模板文件：</p>
