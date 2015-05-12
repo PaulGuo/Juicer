@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.8-stable
+    Version: 0.6.9-stable
 */
 
 (function() {
@@ -138,7 +138,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.6.8-stable';
+    juicer.version = '0.6.9-stable';
     juicer.settings = {};
 
     juicer.tags = {
@@ -538,6 +538,11 @@
 
         return this.compile(tpl, options).render(data, options._method);
     };
+
+    // avoid memory leak for node.js
+    if(typeof(global) !== 'undefined' && typeof(window) === 'undefined') {
+        juicer.set('cache', false);
+    }
 
     typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
 

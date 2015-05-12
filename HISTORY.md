@@ -115,3 +115,7 @@ Juicer Change History
 0.6.8
 -----
 * update `inline helper register` for browser support.
+
+0.6.9
+-----
+* set `cache` to `false` as default in node.js environment, avoid memory leak.
