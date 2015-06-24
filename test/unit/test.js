@@ -224,6 +224,11 @@ test('inline helper register for browser', function() {
     ok(result === '246', 'Passed!');
 });
 
+test('inline helper register with slashes for browser (#issue 78)', function() {
+    var result = juicer('${test|uri}', {});
+    ok(result === 'http://juicer.name', 'Passed!');
+});
+
 test('custom tag for if-else and interpolate', function() {
     juicer.set({
         'tag::operationOpen': '{{%',

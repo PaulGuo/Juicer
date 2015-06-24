@@ -119,3 +119,7 @@ Juicer Change History
 0.6.9
 -----
 * set `cache` to `false` as default in node.js environment, avoid memory leak.
+
+0.6.10
+------
+* fixed bug that inline helper register failed with slashes content (`issue #78`).

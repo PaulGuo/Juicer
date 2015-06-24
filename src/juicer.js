@@ -122,7 +122,6 @@
             fnText = fn;
         }
 
-        fnText = fnText.replace(STRIP_COMMENTS, '');
         fnText = fnText.trim();
         argDecl = fnText.match(FN_ARGS);
         fnBody = fnText.match(FN_BODY)[1].trim();
