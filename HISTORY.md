@@ -123,3 +123,7 @@ Juicer Change History
 0.6.10
 ------
 * fixed bug that inline helper register failed with slashes content (`issue #78`).
+
+0.6.12
+------
+* fixed `__escapehtml` bug that `'` will not be escaped.
