@@ -136,7 +136,7 @@
         return [args, fnBody];
     };
 
-    juicer.__cache = {};
+    juicer.__cache = new Cache(1000);
     juicer.version = '0.6.12-stable';
     juicer.settings = {};
 
