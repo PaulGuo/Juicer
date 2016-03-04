@@ -511,12 +511,18 @@
         }
 
         try {
-            var engine = this.__cache[tpl] ? 
-                this.__cache[tpl] : 
-                new this.template(this.options).parse(tpl, options);
+            // var engine = this.__cache[tpl] ?
+            //     this.__cache[tpl] :
+            //     new this.template(this.options).parse(tpl, options);
 
-            if(!options || options.cache !== false) {
-                this.__cache[tpl] = engine;
+            // if(!options || options.cache !== false) {
+            //     this.__cache[tpl] = engine;
+            // }
+
+            var engine = this.__cache.get(tpl) || new this.template(this.options).parse(tpl, options);
+
+            if (!options || options.cache !== false) {
+                this.__cache.put(tpl, engine);
             }
 
             return engine;
@@ -545,4 +551,106 @@
 
     typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
 
+    // lru cache
+    // author: Evan You <yyx990803@gmail.com>
+    function Cache (limit) {
+        this.size = 0;
+        this.limit = limit;
+        this.head = this.tail = undefined;
+        this._keymap = Object.create(null);
+    }
+
+    var p = Cache.prototype;
+
+    /**
+     * Put <value> into the cache associated with <key>.
+     * Returns the entry which was removed to make room for
+     * the new entry. Otherwise undefined is returned.
+     * (i.e. if there was enough room already).
+     *
+     * @param {String} key
+     * @param {*} value
+     * @return {Entry|undefined}
+     */
+
+    p.put = function (key, value) {
+        var removed;
+        if (this.size === this.limit) {
+            removed = this.shift();
+        }
+
+        var entry = this.get(key, true);
+        if (!entry) {
+            entry = {
+                key: key
+            };
+            this._keymap[key] = entry;
+            if (this.tail) {
+                this.tail.newer = entry;
+                entry.older = this.tail;
+            } else {
+                this.head = entry;
+            }
+            this.tail = entry;
+            this.size++;
+        }
+        entry.value = value;
+
+        return removed;
+    };
+
+    /**
+     * Purge the least recently used (oldest) entry from the
+     * cache. Returns the removed entry or undefined if the
+     * cache was empty.
+     */
+
+    p.shift = function () {
+        var entry = this.head;
+        if (entry) {
+            this.head = this.head.newer;
+            this.head.older = undefined;
+            entry.newer = entry.older = undefined;
+            this._keymap[entry.key] = undefined;
+            this.size--;
+        }
+        return entry;
+    };
+
+    /**
+     * Get and register recent use of <key>. Returns the value
+     * associated with <key> or undefined if not in cache.
+     *
+     * @param {String} key
+     * @param {Boolean} returnEntry
+     * @return {Entry|*}
+     */
+
+    p.get = function (key, returnEntry) {
+        var entry = this._keymap[key];
+        if (entry === undefined) return;
+        if (entry === this.tail) {
+            return returnEntry ? entry : entry.value;
+        }
+        // HEAD--------------TAIL
+        //   <.older   .newer>
+        //  <--- add direction --
+        //   A  B  C  <D>  E
+        if (entry.newer) {
+            if (entry === this.head) {
+                this.head = entry.newer;
+            }
+            entry.newer.older = entry.older; // C <-- E.
+        }
+        if (entry.older) {
+            entry.older.newer = entry.newer; // C. --> E
+        }
+        entry.newer = undefined; // D --x
+        entry.older = this.tail; // D. --> E
+        if (this.tail) {
+            this.tail.newer = entry; // E. <-- D
+        }
+        this.tail = entry;
+        return returnEntry ? entry : entry.value;
+    };
 })();
