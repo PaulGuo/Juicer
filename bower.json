@@ -1,0 +1,20 @@
+{
+  "name": "Juicer",
+  "version": "0.6.5-stable",
+  "homepage": "https://github.com/PaulGuo",
+  "authors": [
+    "badkaikai@gmail.com"
+  ],
+  "description": "A Light Javascript Templete Engine",
+  "keywords": [
+    "template"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
