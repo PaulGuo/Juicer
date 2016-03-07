@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.12-stable
+    Version: 0.6.13
 */
 
 (function() {
@@ -137,7 +137,7 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.6.12-stable';
+    juicer.version = '0.6.13';
     juicer.settings = {};
 
     juicer.tags = {
@@ -510,13 +510,32 @@
             options = __creator(options, this.options);
         }
 
+        var that = this;
+        var cacheStore = {
+            get: function(tpl) {
+                if(options.cachestore) {
+                    return options.cachestore.get(tpl);
+                }
+
+                return that.__cache[tpl];
+            },
+
+            set: function(tpl, val) {
+                if(options.cachestore) {
+                    return options.cachestore.set(tpl, val);
+                }
+
+                return that.__cache[tpl] = val;
+            }
+        };
+
         try {
-            var engine = this.__cache[tpl] ? 
-                this.__cache[tpl] : 
+            var engine = cacheStore.get(tpl) ? 
+                cacheStore.get(tpl) : 
                 new this.template(this.options).parse(tpl, options);
 
             if(!options || options.cache !== false) {
-                this.__cache[tpl] = engine;
+                cacheStore.set(tpl, engine);
             }
 
             return engine;

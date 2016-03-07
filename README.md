@@ -1,6 +1,6 @@
 ## Juicer 中文文档
 
-__当前最新版本: 0.6.12-stable__
+__当前最新版本: 0.6.13__
 
 Juicer 是一个高效、轻量的前端 (Javascript) 模板引擎，使用 Juicer 可以是你的代码实现数据和视图模型的分离(MVC)。除此之外，它还可以在 Node.js 环境中运行。
 
@@ -215,9 +215,9 @@ Javascript 代码：
 	var juicer = require('juicer');
 	var html = juicer(tpl, data);
 
-#### 在 express.js 框架中使用
+#### 在 Express.js 框架中使用
 
-在 express 2.x 系列版本中：
+在 Express 2.x 系列版本中：
 
 	npm install juicer
 	var juicer = require('juicer');
@@ -228,7 +228,7 @@ Javascript 代码：
 		}
 	});
 
-在 express 3.x 系列版本中：
+在 Express 3.x 系列版本中：
 
 	npm install juicer
 	var juicer = require('juicer');
@@ -242,6 +242,12 @@ Javascript 代码：
 		});
 	});
 
+在 Express 4.x 系列版本中：
+
+	var juicerExpressAdapter = require('juicer-express-adapter');
+	app.set('view engine', 'html');
+	app.engine('html', juicerExpressAdapter);
+
 在命令行预编译模板文件：
 
 	npm install -g juicer
@@ -249,6 +255,14 @@ Javascript 代码：
 
 	// type `juicer` after install for more help.
 	// 全局模式安装 `juicer` 后，在命令行下输入 `juicer` 可以获得更多帮助信息。
+
+为模板引擎设置外部Cache存储：
+
+	var juicer = require('juicer');
+	var LRUCache = require('lru-native');
+	var cache = new LRUCache({ maxElements: 1000 });
+
+	juicer.set('cachestore', cache);
 
 [](!demo)
 ## * 一个完整的例子

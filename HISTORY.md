@@ -127,3 +127,7 @@ Juicer Change History
 0.6.12
 ------
 * fixed `__escapehtml` bug that `'` will not be escaped.
+
+0.6.13
+------
+* added `cachestore` option to support the cache storage custom, e.g. LRUCache.
