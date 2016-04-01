@@ -1,6 +1,6 @@
 {
   "name": "juicer",
-  "version": "0.6.13",
+  "version": "0.6.14",
   "description": "a high-performance lightweight javascript template engine",
   "homepage": "http://juicer.name",
   "author": "juicer.js authors {badkaikai@gmail.com | http://benben.cc}",

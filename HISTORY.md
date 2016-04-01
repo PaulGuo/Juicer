@@ -131,3 +131,7 @@ Juicer Change History
 0.6.13
 ------
 * added `cachestore` option to support the cache storage custom, e.g. LRUCache.
+
+0.6.14
+------
+* fixed regular expressions in `variableAnalyze` method.

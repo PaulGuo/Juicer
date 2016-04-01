@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.13
+    Version: 0.6.14
 */
 
 (function() {
@@ -32,8 +32,9 @@
             });
         }
 
-        if(typeof(document) !== 'undefined' && document.body) {
-            juicer.compile.call(juicer, document.body.innerHTML);
+        if(juicer.documentHTML) {
+            juicer.compile.call(juicer, juicer.documentHTML);
+            juicer.documentHTML = '';
         }
 
         if(arguments.length == 1) {
@@ -137,8 +138,9 @@
     };
 
     juicer.__cache = {};
-    juicer.version = '0.6.13';
+    juicer.version = '0.6.14';
     juicer.settings = {};
+    juicer.documentHTML = '';
 
     juicer.tags = {
         operationOpen: '{@',
@@ -419,6 +421,12 @@
                         return $;
                     }
 
+                    // avoid SyntaxError: Unexpected number
+
+                    if(statement.match(/^\d+/igm)) {
+                        return $;
+                    }
+
                     buffer.push(statement); // fuck ie
                 }
 
@@ -430,13 +438,13 @@
                 replace(juicer.settings.ifstart, variableAnalyze).
                 replace(juicer.settings.elseifstart, variableAnalyze).
                 replace(juicer.settings.include, variableAnalyze).
-                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)\[\]]\s*([A-Za-z_]+)/igm, variableAnalyze);
+                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)\[\]]\s*([A-Za-z_0-9]+)/igm, variableAnalyze);
 
-            for(var i = 0;i < buffer.length; i++) {
+            for(var i = 0; i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
             }
 
-            for(var i = 0;i < method.length; i++) {
+            for(var i = 0; i < method.length; i++) {
                 prefix += 'var ' + method[i] + '=_method.' + method[i] + ';';
             }
 
@@ -560,6 +568,10 @@
     // avoid memory leak for node.js
     if(typeof(global) !== 'undefined' && typeof(window) === 'undefined') {
         juicer.set('cache', false);
+    }
+
+    if(typeof(document) !== 'undefined' && document.body) {
+        juicer.documentHTML = document.body.innerHTML;
     }
 
     typeof(module) !== 'undefined' && module.exports ? module.exports = juicer : this.juicer = juicer;
