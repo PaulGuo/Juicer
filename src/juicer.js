@@ -272,8 +272,20 @@
 
             if(_define.length > 1) {
                 _name = _define.shift();
-                _cluster = _define.shift().split(',');
-                _fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
+
+                var makeFnString = function(_name, _cluster) {
+                    return '_method.' + _cluster.shift() + '.call({}, ' + ['(' + _name + ')'].concat(_cluster) + ')';
+                };
+
+                var _fns = '';
+                for(var i=0; i<_define.length; i++) {
+                    if (_fns !== "") {
+                        _name = _fns;
+                    }
+                    _fns = makeFnString(_name, _define[i].split(","))
+                }
+
+                _fn = _fns;
             }
 
             return '<%= ' + (_escape ? '_method.__escapehtml.escaping' : '') + '(' +
@@ -339,7 +351,7 @@
                 })
 
                 // clean up comments
-                .replace(juicer.settings.inlinecomment, '')
+                tpl.replace(juicer.settings.inlinecomment, '')
 
                 // range expression
                 .replace(juicer.settings.rangestart, function($, _name, start, end) {
