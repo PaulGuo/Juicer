@@ -273,7 +273,7 @@
             if(_define.length > 1) {
                 _name = _define.shift();
                 _cluster = _define.shift().split(',');
-                _fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
+                _fn = '_method.' + _cluster.shift() + '.call(this, ' + [_name].concat(_cluster) + ')';
             }
 
             return '<%= ' + (_escape ? '_method.__escapehtml.escaping' : '') + '(' +
