@@ -7,7 +7,7 @@
     Gtalk: badkaikai@gmail.com
     Blog: http://benben.cc
     Licence: MIT License
-    Version: 0.6.5-stable
+    Version: 0.6.15
 */
 
 YUI.add('juicer', function(Y) {
@@ -31,11 +31,16 @@ YUI.add('juicer', function(Y) {
                 args[0] = elem ? (elem.value || elem.innerHTML) : $;
             });
         }
-        
+
+        if(juicer.documentHTML) {
+            juicer.compile.call(juicer, juicer.documentHTML);
+            juicer.documentHTML = '';
+        }
+
         if(arguments.length == 1) {
             return juicer.compile.apply(juicer, args);
         }
-        
+
         if(arguments.length >= 2) {
             return juicer.to_html.apply(juicer, args);
         }
@@ -54,13 +59,13 @@ YUI.add('juicer', function(Y) {
             return __escapehtml.escapehash[k];
         },
         escaping: function(str) {
-            return typeof(str) !== 'string' ? str : str.replace(/[&<>"]/igm, this.escapereplace);
+            return typeof(str) !== 'string' ? str : str.replace(/[&<>"']/igm, this.escapereplace);
         },
         detection: function(data) {
             return typeof(data) === 'undefined' ? '' : data;
         }
     };
-    
+
     var __throw = function(error) {
         if(typeof(console) !== 'undefined') {
             if(console.warn) {
@@ -73,7 +78,7 @@ YUI.add('juicer', function(Y) {
                 return;
             }
         }
-        
+
         throw(error);
     };
 
@@ -99,9 +104,43 @@ YUI.add('juicer', function(Y) {
         return n;
     };
 
+    var annotate = function(fn) {
+        var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
+        var FN_ARG_SPLIT = /,/;
+        var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+        var FN_BODY = /^function[^{]+{([\s\S]*)}/m;
+        var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        var args = [],
+            fnText,
+            fnBody,
+            argDecl;
+
+        if (typeof fn === 'function') {
+            if (fn.length) {
+                fnText = fn.toString();
+            }
+        } else if(typeof fn === 'string') {
+            fnText = fn;
+        }
+
+        fnText = fnText.trim();
+        argDecl = fnText.match(FN_ARGS);
+        fnBody = fnText.match(FN_BODY)[1].trim();
+
+        for(var i = 0; i < argDecl[1].split(FN_ARG_SPLIT).length; i++) {
+            var arg = argDecl[1].split(FN_ARG_SPLIT)[i];
+            arg.replace(FN_ARG, function(all, underscore, name) {
+                args.push(name);
+            });
+        }
+
+        return [args, fnBody];
+    };
+
     juicer.__cache = {};
-    juicer.version = '0.6.5-stable';
+    juicer.version = '0.6.15';
     juicer.settings = {};
+    juicer.documentHTML = '';
 
     juicer.tags = {
         operationOpen: '{@',
@@ -138,6 +177,9 @@ YUI.add('juicer', function(Y) {
         var inlinecomment = juicer.tags.commentOpen + '[^}]*?' + juicer.tags.commentClose;
         var rangestart = juicer.tags.operationOpen + 'each\\s*(\\w*?)\\s*in\\s*range\\(([^}]+?)\\s*,\\s*([^}]+?)\\)' + juicer.tags.operationClose;
         var include = juicer.tags.operationOpen + 'include\\s*([^}]*?)\\s*,\\s*([^}]*?)' + juicer.tags.operationClose;
+        var helperRegisterStart = juicer.tags.operationOpen + 'helper\\s*([^}]*?)\\s*' + juicer.tags.operationClose;
+        var helperRegisterBody = '([\\s\\S]*?)';
+        var helperRegisterEnd = juicer.tags.operationOpen + '\\/helper' + juicer.tags.operationClose;
 
         juicer.settings.forstart = new RegExp(forstart, 'igm');
         juicer.settings.forend = new RegExp(forend, 'igm');
@@ -150,6 +192,7 @@ YUI.add('juicer', function(Y) {
         juicer.settings.inlinecomment = new RegExp(inlinecomment, 'igm');
         juicer.settings.rangestart = new RegExp(rangestart, 'igm');
         juicer.settings.include = new RegExp(include, 'igm');
+        juicer.settings.helperRegister = new RegExp(helperRegisterStart + helperRegisterBody + helperRegisterEnd, 'igm');
     };
 
     juicer.tagInit();
@@ -185,7 +228,7 @@ YUI.add('juicer', function(Y) {
             set(conf, value);
             return;
         }
-        
+
         if(conf === Object(conf)) {
             for(var i in conf) {
                 if(conf.hasOwnProperty(i)) {
@@ -230,7 +273,7 @@ YUI.add('juicer', function(Y) {
             if(_define.length > 1) {
                 _name = _define.shift();
                 _cluster = _define.shift().split(',');
-                _fn = '_method.' + _cluster.shift() + '.call({}, ' + [_name].concat(_cluster) + ')';
+                _fn = '_method.' + _cluster.shift() + '.call(this, ' + [_name].concat(_cluster) + ')';
             }
 
             return '<%= ' + (_escape ? '_method.__escapehtml.escaping' : '') + '(' +
@@ -243,8 +286,19 @@ YUI.add('juicer', function(Y) {
 
         this.__removeShell = function(tpl, options) {
             var _counter = 0;
-            
+
             tpl = tpl
+                // inline helper register
+                .replace(juicer.settings.helperRegister, function($, helperName, fnText) {
+                    var anno = annotate(fnText);
+                    var fnArgs = anno[0];
+                    var fnBody = anno[1];
+                    var fn = new Function(fnArgs.join(','), fnBody);
+
+                    juicer.register(helperName, fn);
+                    return $;
+                })
+
                 // for expression
                 .replace(juicer.settings.forstart, function($, _name, alias, key) {
                     var alias = alias || 'value', key = key && key.substr(1);
@@ -298,6 +352,8 @@ YUI.add('juicer', function(Y) {
 
                 // include sub-template
                 .replace(juicer.settings.include, function($, tpl, data) {
+                    // compatible for node.js
+                    if(tpl.match(/^file\:\/\//igm)) return $;
                     return '<%= _method.__juicer(' + tpl + ', ' + data + '); %>';
                 });
 
@@ -332,22 +388,22 @@ YUI.add('juicer', function(Y) {
                 if (Array.prototype.indexOf && array.indexOf === Array.prototype.indexOf) {
                     return array.indexOf(item);
                 }
-                
+
                 for(var i=0; i < array.length; i++) {
                     if(array[i] === item) return i;
                 }
-                
+
                 return -1;
             };
 
             var variableAnalyze = function($, statement) {
                 statement = statement.match(/\w+/igm)[0];
-                
+
                 if(indexOf(buffer, statement) === -1 && indexOf(reserved, statement) === -1 && indexOf(method, statement) === -1) {
-                    
+
                     // avoid re-declare native function, if not do this, template 
                     // `{@if encodeURIComponent(name)}` could be throw undefined.
-                    
+
                     if(typeof(window) !== 'undefined' && typeof(window[statement]) === 'function' && window[statement].toString().match(/^\s*?function \w+\(\) \{\s*?\[native code\]\s*?\}\s*?$/i)) {
                         return $;
                     }
@@ -365,6 +421,12 @@ YUI.add('juicer', function(Y) {
                         return $;
                     }
 
+                    // avoid SyntaxError: Unexpected number
+
+                    if(statement.match(/^\d+/igm)) {
+                        return $;
+                    }
+
                     buffer.push(statement); // fuck ie
                 }
 
@@ -376,19 +438,19 @@ YUI.add('juicer', function(Y) {
                 replace(juicer.settings.ifstart, variableAnalyze).
                 replace(juicer.settings.elseifstart, variableAnalyze).
                 replace(juicer.settings.include, variableAnalyze).
-                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)\[\]]\s*([A-Za-z_]+)/igm, variableAnalyze);
+                replace(/[\+\-\*\/%!\?\|\^&~<>=,\(\)\[\]]\s*([A-Za-z_0-9]+)/igm, variableAnalyze);
 
-            for(var i = 0;i < buffer.length; i++) {
+            for(var i = 0; i < buffer.length; i++) {
                 prefix += 'var ' + buffer[i] + '=_.' + buffer[i] + ';';
             }
 
-            for(var i = 0;i < method.length; i++) {
+            for(var i = 0; i < method.length; i++) {
                 prefix += 'var ' + method[i] + '=_method.' + method[i] + ';';
             }
 
             return '<% ' + prefix + ' %>';
         };
-        
+
         this.__convert=function(tpl, strip) {
             var buffer = [].join('');
 
@@ -423,7 +485,7 @@ YUI.add('juicer', function(Y) {
                     .split("<%").join("';")
                     .split("%>").join("_out+='")+
                     "';return _out.replace(/[\\r\\n]\\s+[\\r\\n]/g, '\\r\\n');";
-                    
+
             return buffer;
         };
 
@@ -433,7 +495,7 @@ YUI.add('juicer', function(Y) {
             if(!options || options.loose !== false) {
                 tpl = this.__lexicalAnalyze(tpl) + tpl;
             }
-            
+
             tpl = this.__removeShell(tpl, options);
             tpl = this.__toNative(tpl, options);
 
@@ -456,20 +518,39 @@ YUI.add('juicer', function(Y) {
             options = __creator(options, this.options);
         }
 
-        try {
-            var engine = this.__cache[tpl] ? 
-                this.__cache[tpl] : 
-                new this.template(this.options).parse(tpl, options);
-            
-            if(!options || options.cache !== false) {
-                this.__cache[tpl] = engine;
+        var that = this;
+        var cacheStore = {
+            get: function(tpl) {
+                if(options.cachestore) {
+                    return options.cachestore.get(tpl);
+                }
+
+                return that.__cache[tpl];
+            },
+
+            set: function(tpl, val) {
+                if(options.cachestore) {
+                    return options.cachestore.set(tpl, val);
+                }
+
+                return that.__cache[tpl] = val;
             }
-            
+        };
+
+        try {
+            var engine = cacheStore.get(tpl) ? 
+                cacheStore.get(tpl) : 
+                new this.template(this.options).parse(tpl, options);
+
+            if(!options || options.cache !== false) {
+                cacheStore.set(tpl, engine);
+            }
+
             return engine;
 
         } catch(e) {
             __throw('Juicer Compile Exception: ' + e.message);
-            
+
             return {
                 render: function() {} // noop
             };
@@ -483,6 +564,15 @@ YUI.add('juicer', function(Y) {
 
         return this.compile(tpl, options).render(data, options._method);
     };
+
+    // avoid memory leak for node.js
+    if(typeof(global) !== 'undefined' && typeof(window) === 'undefined') {
+        juicer.set('cache', false);
+    }
+
+    if(typeof(document) !== 'undefined' && document.body) {
+        juicer.documentHTML = document.body.innerHTML;
+    }
 
     Y.juicer = juicer;
 

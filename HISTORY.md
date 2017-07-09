@@ -135,3 +135,7 @@ Juicer Change History
 0.6.14
 ------
 * fixed regular expressions in `variableAnalyze` method.
+
+0.6.15
+------
+* pass-through `this` to helper function as running context.
