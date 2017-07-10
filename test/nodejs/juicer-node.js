@@ -38,6 +38,7 @@ var tpl=[
 	'</ul>'
 ].join('');
 
+<!-- run node server: node juicer-node.js -->
 http.createServer(function(req, res) {
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	res.write('<h2>Hello Juicer</h2>\n');
