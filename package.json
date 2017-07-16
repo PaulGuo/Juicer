@@ -23,6 +23,6 @@
   },
   "dependencies": {
     "optimist": "~0.3",
-    "uglify-js": "~1.2"
+    "uglify-js": "~2.8.29"
   }
 }
